@@ -1,4 +1,5 @@
 # Guitar-Learning-Assistant-RTEP5
+![image](https://github.com/user-attachments/assets/e07a5550-07ae-4ea3-8d5d-35c13ffcd222)
 
 This repository is for the development of a real-time learning assistant used to help beginner guitarists practice. 
 
