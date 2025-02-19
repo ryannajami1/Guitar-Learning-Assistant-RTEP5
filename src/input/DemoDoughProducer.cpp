@@ -1,30 +1,37 @@
-#include "DemoDoughProducer.h"
+#include "DemoDoughProducer.hpp"
 
-Dough::Dough(std::string type, int quantity) : type(type), quantity(quantity) {}
+#include <utility>
+#include <iostream>
+#include <ostream>
+#include <string>
+#include <functional>
 
-void Dough::describe() const {
-    std::cout << "Dough: " << quantity << " units of " << type << std::endl;
+
+Dough::Dough(std::string type, int quantity) : type(std::move(std::move(type))), quantity(quantity) {}
+
+void Dough::Describe() const {
+    std::cout << "Dough: " << quantity << " units of " << type << '\n';
 }
 
 DoughProducer::DoughProducer() {
-    doughInventory.emplace_back("Wheat", 100);
-    doughInventory.emplace_back("Rye", 50);
-    doughInventory.emplace_back("Sourdough", 75);
+    doughInventory_.emplace_back("Wheat", 100);
+    doughInventory_.emplace_back("Rye", 50);
+    doughInventory_.emplace_back("Sourdough", 75);
 }
 
-Dough DoughProducer::produceDough(std::string type, int quantity) {
-    for (auto& dough : doughInventory) {
+auto DoughProducer::ProduceDough(const std::string& type, int quantity) -> Dough {
+    for (auto& dough : doughInventory_) {
         if (dough.type == type && dough.quantity >= quantity) {
             dough.quantity -= quantity;
-            return Dough(type, quantity);
+            return {type, quantity};
         }
     }
-    std::cerr << "Not enough " << type << " dough available." << std::endl;
-    return Dough("", 0); // Return empty dough if not available
+    std::cerr << "Not enough " << type << " dough available." << '\n';
+    return {"", 0}; // Return empty dough if not available
 }
 
-void DoughProducer::deliverDough(std::string type, int quantity, std::function<void(Dough)> deliveryCallback) {
-    Dough dough = produceDough(type, quantity);
+void DoughProducer::DeliverDough(const std::string& type, int quantity, const std::function<void(Dough)>& deliveryCallback) {
+    Dough const dough = ProduceDough(type, quantity);
     if (dough.quantity > 0) {  // Only call back if dough was actually produced
         deliveryCallback(dough); // "Organiser" brings the baker
     }

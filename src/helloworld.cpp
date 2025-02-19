@@ -1,10 +1,9 @@
-#include<stdio.h>
-
-#include "mult5.h"
+#include <cstdio>
+#include "mult5.hpp"
 
 // Main program
-int main(int, char **)
+auto main(int, char **) -> int
 {
     printf("cmake Hello World!\n");
-    printf("6 mulipiled by 5 is: %f\n",mult5(6));
+    printf("6 mulipiled by 5 is: %f\n", Mult5(6));
 }
