@@ -1,9 +1,9 @@
-#ifndef __MULT5
-#define __MULT5
+#ifndef MULT5_HPP
+#define MULT5_HPP
 
 /**
  * Multiplies the floating point variable a with 5.
  **/
-float mult5(const float a);
+auto Mult5(float input) -> float;
 
 #endif
