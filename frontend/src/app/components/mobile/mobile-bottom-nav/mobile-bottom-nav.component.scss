@@ -5,12 +5,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: auto;
   text-decoration: none;
+  margin: 17px;
 
 
   &:before {
-    margin-top: -34px;
+    margin-top: -16px;
     content: '';
     border-radius: 16px;
     position: absolute;
@@ -47,7 +47,6 @@ i {
 }
 
 .mobile-nav {
-  padding-top: 17px;
   background-color: #ffffff;
   z-index: 1000;
   display: flex;
