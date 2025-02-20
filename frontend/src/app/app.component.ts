@@ -15,11 +15,4 @@ import {MobileBottomNavComponent} from './components/mobile/mobile-bottom-nav/mo
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  text = '';
-
-  msg = '';
-
-  onClick() {
-    this.msg = 'Welcome ' + this.text;
-  }
 }
