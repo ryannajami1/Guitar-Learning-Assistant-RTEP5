@@ -1,5 +1,5 @@
-#include "mult5.h"
+#include "mult5.hpp"
 
-float mult5(const float a) {
-    return a*5;
+auto Mult5(const float input) -> float {
+    return input*5;
 }

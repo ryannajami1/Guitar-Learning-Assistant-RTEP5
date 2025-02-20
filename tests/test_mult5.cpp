@@ -1,9 +1,11 @@
-#include "mult5.h"
+#include <iostream>
+#include "mult5.hpp"
 
-// Main program
-int main(int, char **)
+auto main(int, char **) -> int
 {
-    if (mult5(6) != 30) {
-	throw "5*6 != 30";
+    if (Mult5(6) != 30) {
+        std::cerr << "Error: 5*6 != 30\n";
+        return 1; // Nonzero return indicates an error
     }
+    return 0;
 }

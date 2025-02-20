@@ -1,8 +1,14 @@
-#include "DemoBaker.h"
+#include "DemoBaker.hpp"
 
-Baker::Baker(std::string name) : name(name) {}
+#include <utility>
+#include <iostream>
+#include <string>
+#include "../input/DemoDoughProducer.hpp"
 
-void Baker::receiveDough(Dough dough) {
+
+Baker::Baker(std::string name) : name(std::move(std::move(name))) {}
+
+void Baker::ReceiveDough(const Dough& dough) const {
     std::cout << name << " received ";
-    dough.describe();
+    dough.Describe();
 }
