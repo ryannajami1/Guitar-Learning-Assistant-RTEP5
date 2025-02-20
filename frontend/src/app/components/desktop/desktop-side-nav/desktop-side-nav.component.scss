@@ -1,0 +1,91 @@
+@use '../../../../stylesheets/colours' as *;
+@use '../../../../stylesheets/desktop-side-nav' as *;
+
+.desktop-sidenav {
+  background-color: #ffffff;
+  z-index: 1000;
+  display: flex;
+  align-content: flex-end;
+  position: fixed;
+  bottom: 0;
+  height: 100vh;
+  width: $desktop-side-nav-width;
+  flex-direction: column;
+
+  &:not(.hide-shadow) {
+    box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.desktop-sidenav-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+
+
+.desktop-nav-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  text-decoration: none;
+  padding: 17px;
+
+  i {
+    width: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $primary-color;
+    font-size: 1rem;
+  }
+
+  .desktop-nav-label {
+    color: $primary-color;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+
+  &:before {
+    content: '';
+    margin-left: -17px;
+    position: absolute;
+    width: $desktop-side-nav-width;
+    height: 50px;
+    background: $primary-color;
+    z-index: -1;
+    opacity: 0;
+    transform: scaleX(0);
+    transition: all 150ms ease-out;
+  }
+
+  &:hover {
+    &:before {
+      opacity: 0.2;
+      transform: scale(1);
+    }
+  }
+
+  &.active {
+    i {
+      font-weight: 400;
+      color: $primary-color-lighter;
+    }
+
+    p {
+      font-weight: 600;
+      color: $primary-color-lighter;
+    }
+
+    &:before {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+
+}
+

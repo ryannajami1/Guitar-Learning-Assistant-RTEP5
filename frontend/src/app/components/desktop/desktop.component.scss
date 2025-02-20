@@ -1,0 +1,16 @@
+@use '../../../stylesheets/desktop-side-nav' as *;
+
+
+.desktop {
+  display: flex;
+
+  .sidenav {
+    flex: 0 0 $desktop-side-nav-width;
+  }
+
+  .router-outlet {
+    margin-left: 32px;
+    flex: 1;
+    overflow: auto;
+  }
+}
