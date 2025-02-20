@@ -1,0 +1,77 @@
+@use '../../../../stylesheets/colours' as *;
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  text-decoration: none;
+
+
+  &:before {
+    margin-top: -34px;
+    content: '';
+    border-radius: 16px;
+    position: absolute;
+    width: 62px;
+    height: 32px;
+    background: $primary-color;
+    z-index: -1;
+    opacity: 0;
+    transform: scaleX(0);
+    transition: all 100ms ease-out;
+  }
+
+  &.active {
+    i {
+      color: $primary-color-lighter;
+    }
+
+    &:before {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+
+}
+
+i {
+  width: 62px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $primary-color;
+  font-size: 1.5rem;
+}
+
+.mobile-nav {
+  padding-top: 17px;
+  background-color: #ffffff;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-evenly;
+  align-content: flex-end;
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+
+  &:not(.hide-shadow) {
+    box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
+
+div a {
+  width: 33%;
+}
+
+.mobile-nav-label {
+  display: flex;
+  justify-content: center;
+  color: $primary-color;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: .5px;
+}
+
