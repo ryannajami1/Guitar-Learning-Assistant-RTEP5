@@ -7,7 +7,7 @@
 #include <functional>
 
 
-Dough::Dough(std::string type, int quantity) : type(std::move(std::move(type))), quantity(quantity) {}
+Dough::Dough(std::string type, int quantity) : type(std::move(type)), quantity(quantity) {}
 
 void Dough::Describe() const {
     std::cout << "Dough: " << quantity << " units of " << type << '\n';

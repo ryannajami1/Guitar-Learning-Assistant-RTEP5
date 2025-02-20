@@ -1,5 +1,5 @@
-#ifndef DEMODOUGHPRODUCER_H
-#define DEMODOUGHPRODUCER_H
+#ifndef DEMODOUGHPRODUCER_HPP
+#define DEMODOUGHPRODUCER_HPP
 
 #include <vector>
 #include <functional>
