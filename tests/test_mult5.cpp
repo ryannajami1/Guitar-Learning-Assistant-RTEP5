@@ -1,5 +1,5 @@
 #include <iostream>
-#include "mult5.hpp"
+#include "../src/mult5.hpp"
 
 auto main(int, char **) -> int
 {
