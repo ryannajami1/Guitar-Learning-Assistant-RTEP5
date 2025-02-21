@@ -1,0 +1,83 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:bookworm
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y build-essential cmake clang-tidy
+
+      - name: Build
+        run: |
+          chmod +x build.sh
+          ./build.sh 2>&1 | tee output.log
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build/
+
+      - name: Upload build log
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: output.log
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+    continue-on-error: true
+
+    steps:
+      - name: Download build log
+        uses: actions/download-artifact@v4
+        with:
+          name: build-log
+          path: .
+
+      - name: Check for warnings in the build log
+        run: |
+          cat output.log
+          ! grep -q "warning:" output.log
+
+  test:
+    runs-on: ubuntu-latest
+    container: debian:bookworm
+    needs: build
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y build-essential cmake
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build/
+
+      - name: Run tests
+        run: |
+          chmod +x build/tests/*
+          ctest --test-dir ./build
