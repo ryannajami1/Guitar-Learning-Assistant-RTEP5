@@ -22,7 +22,7 @@ mkdir -p build
 cd build
 
 # build the project
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $1 ..
+cmake -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $1 ..
 make
 
 # Change back to the original directory
