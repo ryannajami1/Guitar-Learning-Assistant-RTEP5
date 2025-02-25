@@ -35,3 +35,6 @@
 build/
 
 .idea
+
+# Ignore VSCODE Cringe
+.vscode
