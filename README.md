@@ -31,8 +31,24 @@ sudo apt-get install gcc
 sudo apt-get install gdb
 sudo apt-get install clang-tidy
 ```
-### 3. Build the repository
+## Working with the repo
+### Build the repository
 After cloning the repo it can be built by running build.sh
 ```
 ./build.sh
 ```
+The program can then be run by navigating to the correct location in the build folder, and typing the executable name as a command.
+```
+my_program
+```
+
+### Debugging
+To debug code first build it using the `--debug` argument
+```
+./build.sh --debug
+```
+Then run the executable with the GNU debugger (GDB).
+```
+gdb my_program
+```
+Once in the gdb environment you can type `run` to run the program and it should hopefully give a more useful error message than segmentation fault (yay), or type `q` to quit. You can also add breakpoints and step through code if you are a nerd using the `next`, `step`, `break` and `continue` commands.
