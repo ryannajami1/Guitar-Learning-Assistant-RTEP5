@@ -5,7 +5,6 @@ add_library(mult5 mult5.cpp)
 target_include_directories(mult5 PUBLIC .)
 
 add_executable(helloworld helloworld.cpp)
-add_executable(ChordDetection ChordDetection.cpp)
 target_link_libraries(helloworld mult5)
 
 
