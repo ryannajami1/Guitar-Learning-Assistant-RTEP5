@@ -15,7 +15,7 @@ export class ChordSchematicComponent {
 
   ngOnInit(): void {
     this.chordContainer = Raphael.chord('chord-container', this.getRandomGuitarChord());
-    this.chordContainer.element.setSize(200, 200);
+    this.chordContainer.element.setSize(300, 300);
   }
 
   getRandomGuitarChord(): string {

@@ -14,9 +14,9 @@ body {
   font-weight: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: light-dark(var(--p-surface-50), var(--p-surface-900));
+  background: rgba(212, 217, 219, 0.29);
+  //background: light-dark(var(--p-surface-75), var(--p-surface-900));
 }
-
 
 a {
   text-decoration: none;

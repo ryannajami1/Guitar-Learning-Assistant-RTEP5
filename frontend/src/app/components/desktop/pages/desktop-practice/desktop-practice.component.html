@@ -1,6 +1,51 @@
-<h1>Practice</h1>
+<div style="display: flex; flex-direction: column; min-height: 100vh">
 
+  <h4>Practice</h4>
 
-<app-chord-schematic></app-chord-schematic>
+  <div class="card" style="flex-grow: 1; display: flex; flex-direction: column">
 
-<app-timer></app-timer>
+    <div style="display: flex; flex-direction: row">
+      <div style="flex-grow: 1">
+        <h3 style="margin: 0">Play along</h3>
+      </div>
+
+      <div>
+        <p-button label="Settings"></p-button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: row; flex-grow: 1">
+
+      <div style="width: 60%; display: flex; flex-direction: column; justify-content: center; flex-grow: 1">
+        <h1 style="text-align: center; margin-bottom: 32px; margin-top: 0;">G minor</h1>
+        <app-timer></app-timer>
+
+      </div>
+
+      <div style="width: 40%; display: flex; justify-content: center; flex-grow: 1; align-items: center">
+        <app-chord-schematic></app-chord-schematic>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <div class="card">
+      <div style="flex-grow: 1">
+        <h4 style="margin: 0;">Last 5 chords</h4>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="flex-grow: 1">
+        <h4 style="margin: 0;">Accuracy</h4>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="flex-grow: 1">
+        <h4 style="margin: 0;">Response Time</h4>
+      </div>
+    </div>
+  </div>
+
+</div>

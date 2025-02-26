@@ -32,7 +32,8 @@
               }
             ],
             "styles": [
-              "src/stylesheets/styles.scss"
+              "src/stylesheets/styles.scss",
+              "src/stylesheets/card.scss"
             ],
             "scripts": [
               "public/assets/raphael.js",
@@ -94,7 +95,8 @@
               }
             ],
             "styles": [
-              "src/stylesheets/styles.scss"
+              "src/stylesheets/styles.scss",
+              "src/stylesheets/card.scss"
             ],
             "scripts": [
               "public/assets/raphael.js",
