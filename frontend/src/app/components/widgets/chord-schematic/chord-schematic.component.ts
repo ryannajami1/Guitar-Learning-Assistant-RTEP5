@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 declare var Raphael: any;
 
@@ -10,27 +10,20 @@ declare var Raphael: any;
   styleUrl: './chord-schematic.component.scss'
 })
 export class ChordSchematicComponent {
+  @Input() currentChord: string = '';
 
   private chordContainer: any;
 
-  ngOnInit(): void {
-    this.chordContainer = Raphael.chord('chord-container', this.getRandomGuitarChord());
-    this.chordContainer.element.setSize(300, 300);
-  }
-
-  getRandomGuitarChord(): string {
-    const notes = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-    const chordTypes = ['', 'maj', 'min', '7', 'maj7', 'min7', 'sus4', 'dim', 'aug'];
-
-    const randomNote = notes[Math.floor(Math.random() * notes.length)];
-    const randomChordType = chordTypes[Math.floor(Math.random() * chordTypes.length)];
-
-    return `${randomNote} ${randomChordType}`;
+  ngOnChanges(): void {
+    this.reloadChord();
   }
 
   reloadChord(): void {
-    this.chordContainer.remove();
-    this.chordContainer = Raphael.chord('chord-container', this.getRandomGuitarChord());
-    this.chordContainer.element.setSize(200, 200);
+    if (this.chordContainer) {
+      this.chordContainer.remove();
+    }
+    this.chordContainer = Raphael.chord('chord-container', this.currentChord);
+    this.chordContainer.element.setSize(300, 300);
   }
+
 }

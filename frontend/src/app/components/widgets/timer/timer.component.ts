@@ -1,4 +1,4 @@
-import {Component, ElementRef, Renderer2, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild} from '@angular/core';
 import {ProgressBar} from 'primeng/progressbar';
 
 @Component({
@@ -9,6 +9,8 @@ import {ProgressBar} from 'primeng/progressbar';
   styleUrl: './timer.component.scss'
 })
 export class TimerComponent {
+  @Input() currentChord: string = '';
+  @Output() timeOverEvent = new EventEmitter<null>();
   @ViewChild("loadingBarActive") loadingBarActive: ElementRef | undefined;
 
   startValue: number = 5;
@@ -20,6 +22,10 @@ export class TimerComponent {
 
   ngAfterViewInit(): void {
     this.startCountdown();
+  }
+
+  ngOnChanges(): void {
+    this.restart();
   }
 
   startCountdown(): void {
@@ -38,6 +44,7 @@ export class TimerComponent {
       if (this.currentValue <= 0) {
         this.currentValue = 0;
         clearInterval(this.interval);
+        this.timeOverEvent.next(null);
       } else {
         this.currentValue--;
       }
