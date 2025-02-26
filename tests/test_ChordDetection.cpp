@@ -3,14 +3,15 @@
 #include <map>
 #include <string>
 #include <math.h>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
-auto main(int, char**) -> int {
-
+int test_determine_peaks() {
     ChordDetection cd;
 
-    // Test the peak detection --------------------------------------------------------------------------
+    // Test the peak detection
 
     // Generate sin wave data
     vector<float> wave;
@@ -32,6 +33,12 @@ auto main(int, char**) -> int {
     }
 
     cout << "Peak Detection test passed!\n";
+
+    return 0;
+}
+
+int test_note_lookup() {
+    ChordDetection cd;
 
     // Test the note lookup ------------------------------------------------------------------------------------------
 
@@ -56,6 +63,76 @@ auto main(int, char**) -> int {
     }
 
     cout << "Note Lookup test passed!\n";
+    
+    return 0;
+
+}
+
+int test_fft_data() {
+
+    ChordDetection cd;
+
+    // Read FFT data from CSV file
+    ifstream file("../../tests/fft-data/scope_4_fft.csv");
+    if (!file.is_open()) {
+        cerr << "Failed to open FFT data file.\n";
+        return 1;
+    }
+
+    cout << "File opened succefully!\n";
+
+    vector<vector<float>> fft_data;
+    string line;
+
+    // Remove header
+    getline(file, line);
+
+    // Read in csv data
+    while (getline(file, line)) {
+        vector<float> row;
+        stringstream ss(line);
+        string cell;
+
+        while (getline(ss, cell, ',')) {
+            row.push_back(stof(cell));
+        }
+        fft_data.push_back(row);
+    }
+
+    file.close();
+
+    // Get the magnitude column
+    vector<float> fft_magnitude;
+    for (vector<float> row : fft_data) {
+        fft_magnitude.push_back(row[1]);
+        cout << row[1] << "\n";
+    }
+
+    // Find the noise floor
+    float noise_floor = cd.CalculateNoiseFloor(fft_magnitude);
+    float threshold = noise_floor * 30;
+    cout << "threshold " << threshold << "\n";
+
+    // Run FFT processing function
+    vector<int> peaks = cd.determine_peaks(fft_magnitude, threshold, 0.1, 0);
+
+    // Get frequencies of peaks
+    vector<float> frequencies;
+    for (int peak_index : peaks) {
+        float f = fft_data[peak_index][0];
+        cout << f << "\n";
+        frequencies.push_back(fft_data[peak_index][0]);
+    }
+
+    cout << "FFT Data test passed!\n";
+    return 0;
+}
+
+auto main(int, char**) -> int {
+
+    if (test_determine_peaks()) return 1;
+    if (test_note_lookup()) return 1;
+    if (test_fft_data()) return 1;
     
     return 0;
 }

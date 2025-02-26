@@ -58,7 +58,7 @@ def determine_peaks(data, threshold, min_height, min_width):
     return peak_indices
 
 
-waveform, fft = read_oscilloscope_csv("Oscilloscope Guitar Saves/G chord csv.csv")
+waveform, fft = read_oscilloscope_csv("Oscilloscope Guitar Saves/scope_4.csv")
 
 time = waveform[:, 0]
 voltages = waveform[:, 1]
@@ -72,7 +72,7 @@ noise_floor = np.mean(fft_magnitude)
 peak_threshold = noise_floor*30
 
 # Find peaks in the FFT magnitude data
-peaks, _ = find_peaks(fft_magnitude, prominence=peak_threshold)
+# peaks, _ = find_peaks(fft_magnitude, prominence=peak_threshold)
 peaks = determine_peaks(fft_magnitude, peak_threshold, 0.1, 0)
 
 main_frequencies = fft_freq[peaks]
