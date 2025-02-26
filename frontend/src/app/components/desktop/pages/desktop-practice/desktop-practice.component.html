@@ -13,8 +13,9 @@
         <div style="margin-bottom: -4px">
           <p-toggleswitch [(ngModel)]="showChord"/>
         </div>
-        <div style="margin-left: 4px; margin-right: 32px">Show chord</div>
-        <p-button label="Settings"></p-button>
+        <div (click)="showChord = !showChord" style="margin-left: 4px; margin-right: 32px; cursor: pointer">Show chord
+        </div>
+        <p-button (click)="showSettings = true" label="Settings"></p-button>
       </div>
     </div>
 
@@ -27,7 +28,8 @@
       </div>
 
       <div style="width: 40%; display: flex; justify-content: center; flex-grow: 1; align-items: center">
-        <app-chord-schematic (currentChordChange)="showChord = !showChord" [showChord]="showChord" [currentChord]="currentChord"></app-chord-schematic>
+        <app-chord-schematic (currentChordChange)="showChord = !showChord" [showChord]="showChord"
+                             [currentChord]="currentChord"></app-chord-schematic>
       </div>
     </div>
   </div>
@@ -62,3 +64,90 @@
   </div>
 
 </div>
+
+<p-dialog header="Settings" [modal]="true" [(visible)]="showSettings" [style]="{ width: '25rem' }">
+
+  <h3>Note</h3>
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playA"/>
+    <div (click)="playA = !playA" style="margin-left: 4px; cursor: pointer">Play A</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playB"/>
+    <div (click)="playB = !playB" style="margin-left: 4px; cursor: pointer">Play B</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playC"/>
+    <div (click)="playC = !playC" style="margin-left: 4px; cursor: pointer">Play C</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playD"/>
+    <div (click)="playD = !playD" style="margin-left: 4px; cursor: pointer">Play D</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playE"/>
+    <div (click)="playE = !playE" style="margin-left: 4px; cursor: pointer">Play E</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playF"/>
+    <div (click)="playF = !playF" style="margin-left: 4px; cursor: pointer">Play F</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playG"/>
+    <div (click)="playG = !playG" style="margin-left: 4px; cursor: pointer">Play G</div>
+  </div>
+
+
+  <h3>Chord Types</h3>
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playStandard"/>
+    <div (click)="playStandard = !playStandard" style="margin-left: 4px; cursor: pointer">Play standard</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playMaj"/>
+    <div (click)="playMaj = !playMaj" style="margin-left: 4px; cursor: pointer">Play maj</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playMin"/>
+    <div (click)="playMin = !playMin" style="margin-left: 4px; cursor: pointer">Play min</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="play7"/>
+    <div (click)="play7 = !play7" style="margin-left: 4px; cursor: pointer">Play 7</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playMaj7"/>
+    <div (click)="playMaj7 = !playMaj7" style="margin-left: 4px; cursor: pointer">Play maj7</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playMin7"/>
+    <div (click)="playMin7 = !playMin7" style="margin-left: 4px; cursor: pointer">Play min7</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playSus4"/>
+    <div (click)="playSus4 = !playSus4" style="margin-left: 4px; cursor: pointer">Play sus4</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playDim"/>
+    <div (click)="playDim = !playDim" style="margin-left: 4px; cursor: pointer">Play dim</div>
+  </div>
+
+  <div style="display: flex; flex-direction: row">
+    <p-toggleswitch [(ngModel)]="playAug"/>
+    <div (click)="playAug = !playAug" style="margin-left: 4px; cursor: pointer">Play aug</div>
+  </div>
+
+</p-dialog>
