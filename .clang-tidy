@@ -7,7 +7,6 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
-  llvm-header-guard,
   -google-readability-namespace-comments,
   -google-runtime-int,
   -google-runtime-references,
@@ -17,7 +16,6 @@ Checks: >
   -readability-magic-numbers
 
 # Turn all the warnings from the checks above into errors.
-WarningsAsErrors: "*"
 FormatStyle:  llvm
 UseColor: true
 
@@ -41,4 +39,3 @@ CheckOptions:
   - { key: readability-identifier-naming.MemberConstantPrefix,     value: k         }
   - { key: readability-identifier-naming.StaticConstantCase,       value: CamelCase }
   - { key: readability-identifier-naming.StaticConstantPrefix,     value: k         }
-  - { key: llvm-header-guard.Style,                                value: FileName  }

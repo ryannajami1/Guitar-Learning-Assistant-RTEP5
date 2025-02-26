@@ -1,5 +1,5 @@
-#ifndef DEMOBAKER_H
-#define DEMOBAKER_H
+#ifndef DEMOBAKER_HPP
+#define DEMOBAKER_HPP
 
 #include <string>
 #include "../input/DemoDoughProducer.hpp"
