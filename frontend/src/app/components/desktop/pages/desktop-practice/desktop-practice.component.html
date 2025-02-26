@@ -30,20 +30,29 @@
 
   <div style="display: flex; flex-direction: row">
     <div class="card">
-      <div style="flex-grow: 1">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; height: 100%">
         <h4 style="margin: 0;">Last 5 chords</h4>
+        <div style="flex-grow: 1; justify-content: center; align-items: center; display: flex">
+          <app-last-five-chords></app-last-five-chords>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <div style="flex-grow: 1">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; height: 100%">
         <h4 style="margin: 0;">Accuracy</h4>
+        <div style="flex-grow: 1; justify-content: center; align-items: center; display: flex">
+          <app-accuracy></app-accuracy>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <div style="flex-grow: 1">
-        <h4 style="margin: 0;">Response Time</h4>
+      <div style="flex-grow: 1; display: flex; flex-direction: column; height: 100%">
+        <h4 style="margin: 0;">Avg. response time</h4>
+        <div style="flex-grow: 1; justify-content: center; align-items: center; display: flex">
+          <app-response-time></app-response-time>
+        </div>
       </div>
     </div>
   </div>
