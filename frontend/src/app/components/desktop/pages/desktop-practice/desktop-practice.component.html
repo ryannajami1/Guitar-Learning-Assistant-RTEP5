@@ -9,7 +9,11 @@
         <h3 style="margin: 0">Play along</h3>
       </div>
 
-      <div>
+      <div style="display: flex; flex-direction: row; align-items: center">
+        <div style="margin-bottom: -4px">
+          <p-toggleswitch [(ngModel)]="showChord"/>
+        </div>
+        <div style="margin-left: 4px; margin-right: 32px">Show chord</div>
         <p-button label="Settings"></p-button>
       </div>
     </div>
@@ -23,7 +27,7 @@
       </div>
 
       <div style="width: 40%; display: flex; justify-content: center; flex-grow: 1; align-items: center">
-        <app-chord-schematic [currentChord]="currentChord"></app-chord-schematic>
+        <app-chord-schematic (currentChordChange)="showChord = !showChord" [showChord]="showChord" [currentChord]="currentChord"></app-chord-schematic>
       </div>
     </div>
   </div>

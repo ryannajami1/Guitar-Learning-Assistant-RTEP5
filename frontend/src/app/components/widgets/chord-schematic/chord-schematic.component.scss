@@ -1,0 +1,16 @@
+.blur {
+  filter: blur(40px);
+}
+
+.overlay-text {
+  position: relative;
+  top: -200px;
+  left: -15px;
+  text-align: center;
+  height: 0;
+}
+
+.click-to-show:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}

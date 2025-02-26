@@ -5,17 +5,20 @@ import {ButtonModule} from 'primeng/button';
 import {ResponseTimeComponent} from '../../../widgets/response-time/response-time.component';
 import {LastFiveChordsComponent} from '../../../widgets/last-five-chords/last-five-chords.component';
 import {AccuracyComponent} from '../../../widgets/accuracy/accuracy.component';
+import {ToggleSwitchModule} from 'primeng/toggleswitch';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-desktop-practice',
   standalone: true,
-  imports: [ChordSchematicComponent, TimerComponent, ButtonModule, ResponseTimeComponent, LastFiveChordsComponent, AccuracyComponent],
+  imports: [ChordSchematicComponent, TimerComponent, ButtonModule, ResponseTimeComponent, LastFiveChordsComponent, AccuracyComponent, ToggleSwitchModule, FormsModule],
   templateUrl: './desktop-practice.component.html',
   styleUrl: './desktop-practice.component.scss'
 })
 export class DesktopPracticeComponent {
 
   currentChord: string;
+  showChord: boolean = true;
 
   constructor() {
     this.currentChord = this.getRandomGuitarChord();

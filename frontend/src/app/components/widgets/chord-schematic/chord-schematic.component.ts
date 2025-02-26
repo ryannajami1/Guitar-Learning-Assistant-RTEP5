@@ -1,16 +1,20 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {CommonModule, NgIf} from '@angular/common';
+import {ButtonModule} from 'primeng/button';
 
 declare var Raphael: any;
 
 @Component({
   selector: 'app-chord-schematic',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, NgIf, ButtonModule],
   templateUrl: './chord-schematic.component.html',
   styleUrl: './chord-schematic.component.scss'
 })
 export class ChordSchematicComponent {
   @Input() currentChord: string = '';
+  @Output() currentChordChange: EventEmitter<void> = new EventEmitter<void>();
+  @Input() showChord: boolean = true;
 
   private chordContainer: any;
 
