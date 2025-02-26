@@ -34,7 +34,10 @@
             "styles": [
               "src/stylesheets/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "public/assets/raphael.js",
+              "public/assets/raphael.chord.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -93,7 +96,10 @@
             "styles": [
               "src/stylesheets/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "public/assets/raphael.js",
+              "public/assets/raphael.chord.js"
+            ]
           }
         }
       }
