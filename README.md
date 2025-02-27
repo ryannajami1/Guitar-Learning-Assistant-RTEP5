@@ -11,6 +11,13 @@ If the user plays incorrectly, the screen will show wrong (X) and briefly show t
 
 The device has to react to the signal received from the guitar, and determine if the sound is correct or not.
 
+## Correct Raspberry Pi shutdown
+PI SHUTDOWN (IMPORTANT!!)
+DO NOT shut down the Pi by just unplugging it from power. This is fine as a one-off but in the long run it might end up breaking the filesystem. To shut the Pi down properly, in the command line, type "sudo shutdown -h now" and wait till the green light stops flashing and the red light is steady
+```
+sudo shutdown -h now
+```
+
 ## Setup instructions
 ### 1. Install WSL (Windows only)
 Go to the microsoft store and search for WSL or Ubuntu and install Ubuntu
