@@ -92,7 +92,37 @@ Then, as prompted: enter the password
 7. Select OS (Linux)
    ![image](https://github.com/user-attachments/assets/fa647b7c-839c-4854-bab4-b401edd2f66d)
 
+### Get IP of Raspberry in network:
+```
+Resolve-DnsName team29.local
+
+```
+![image](https://github.com/user-attachments/assets/86d98ab6-b4f2-4641-b586-264ad8c3ac1f)
 
 
-   
+### Add new WiFi credentials to Raspberry
+This could be convenient to access the raspberry from your home network, without needing to connect it to your router via LAN
 
+1. Connect to raspberry via ssh (team29@team29.local)
+2. Open WiFi configuration file
+   ```
+   sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+   ```
+3. Add
+  ```
+   network={
+       ssid="New_WiFi_Name"
+       psk="New_WiFi_Password"
+   }
+   ```
+   If other networks are already present, just add this after the previous one. Please do not remove networks of others. If the network is hidden, further add scan_ssid=1. The file should look like the following, if two networks are present:
+   ![image](https://github.com/user-attachments/assets/d10b41e1-814c-4e3a-964e-06a1c3712f8e)
+4. Close File by pressing Ctlr + X, then Y, then Enter
+5. Restart the WiFi service
+   ```
+   sudo wpa_cli -i wlan0 reconfigure
+   ```
+   Or reboot:
+   ```
+   sudo reboot
+   ```
