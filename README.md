@@ -114,31 +114,31 @@ Resolve-DnsName team29.local
 This could be convenient to access the raspberry from your home network, without needing to connect it to your router via LAN
 
 1. Connect to raspberry via ssh (team29@team29.local)
-2. Open WiFi configuration file
-```
-sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
-```
-3. Add network credentials
-```
-network={
-    ssid="New_WiFi_Name"
-    psk="New_WiFi_Password"
-}
-```
+2. Open network manager ui
+   ```
+   sudo nmtui
+   ```
+   This should open an interface:
 
-If other networks are already present, just add this after the previous one. Please do not remove networks of others. If the network is hidden, further add scan_ssid=1. The file should look like the following, if two networks are present:
+![image](https://github.com/user-attachments/assets/5574c317-ff2d-4ed9-abcf-220e2218394d)
 
-![image](https://github.com/user-attachments/assets/d10b41e1-814c-4e3a-964e-06a1c3712f8e)
+3. Edit connection -> Add
 
-4. Close File by pressing Ctlr + X, then Y, then Enter
+![image](https://github.com/user-attachments/assets/b774c694-4284-44f2-a9ad-1ef582f04264)
 
+4. Choose WiFi
 
-5. Restart the WiFi service
+![image](https://github.com/user-attachments/assets/2d8f5437-0bcb-4745-8599-c9667643b9b1)
 
-```
-sudo wpa_cli -i wlan0 reconfigure
-```
-Or reboot:
-```
-sudo reboot
-```
+5. Enter details
+   Profile name -> e.g. your name (just a label for the connection)
+   SSID -> Network name
+   Security -> Most likely WPA & WPA2 Personal
+   Password
+   -> Keep the rest free
+6. Press okay, then back, then ok
+7. Reboot likely needed to confirm changes
+   ```
+   sudo reboot
+   ```
+
