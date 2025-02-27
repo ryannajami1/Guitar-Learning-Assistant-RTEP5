@@ -9,11 +9,13 @@
 #include <cstring>
 #include <memory>
 
+#define FRAMES 128
+
 /**
  * GuitarFFTProcessor
  * 
  * Processes guitar audio signals using FFT to detect dominant frequencies.
- * Modified to work with small frame sizes (32 samples) by collecting multiple frames.
+ * Modified to work with small frame sizes (No. of samples) by collecting multiple frames.
  */
 class GuitarFFTProcessor {
 private:
@@ -118,9 +120,9 @@ private:
     }
 
 public:
-    GuitarFFTProcessor(unsigned int frame_size = 32, 
+    GuitarFFTProcessor(unsigned int frame_size = FRAMES, 
                        unsigned int rate = 2000,
-                       unsigned int frames_to_process = 32) 
+                       unsigned int frames_to_process = FRAMES) 
     : samples_per_frame(frame_size),
       sample_rate(rate),
       frames_to_collect(frames_to_process),
@@ -282,12 +284,12 @@ public:
 
 /**
  * Example main function showing how to use the FFT processor
- * with 32-sample frames from ALSA
+ * with sample frames from ALSA
  */
 int main() {
-    // Create processor for 32-sample frames at 2kHz
-    // Will collect 32 frames (total 1024 samples) before processing
-    GuitarFFTProcessor processor(32, 2000, 32);
+    // Create processor for Sampled frames at 2kHz
+    // Will collect frames (total 1024 samples) before processing
+    GuitarFFTProcessor processor(FRAMES, 2000, FRAMES);
     
     // Initialize the processor
     if (!processor.initialize()) {
@@ -295,8 +297,8 @@ int main() {
         return 1;
     }
     
-    // Simulate receiving frames from ALSA (1 frame = 32 samples)
-    std::vector<short> test_frame(32);
+    // Simulate receiving frames from ALSA (1 frame = No. of samples)
+    std::vector<short> test_frame(FRAMES);
     
     // Generate a 440Hz sine wave (A4 note)
     double amplitude = 10000.0;
@@ -306,8 +308,8 @@ int main() {
     // Process 100 frames (more than needed to trigger FFT processing)
     for (int frame = 0; frame < 100; frame++) {
         // Generate one frame of sine wave
-        for (int i = 0; i < 32; i++) {
-            double t = (frame * 32 + i) / sample_rate;
+        for (int i = 0; i < FRAMES; i++) {
+            double t = (frame * FRAMES + i) / sample_rate;
             test_frame[i] = static_cast<short>(amplitude * sin(2.0 * M_PI * frequency * t));
         }
         
