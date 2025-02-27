@@ -81,16 +81,26 @@ Then, as prompted: enter the password
 ### Connect via VS Code, without needing passphrase
 1. Install SSH Remote connection extension
 2. Open remote explorer
-   ![image](https://github.com/user-attachments/assets/d6dce706-2fe4-4001-9961-108b6b8b89dc)
+
+![image](https://github.com/user-attachments/assets/d6dce706-2fe4-4001-9961-108b6b8b89dc)
+
 3. Add new remote
-   ![image](https://github.com/user-attachments/assets/f6331e8b-24c2-4554-937f-89f4c1f89b6f)
+
+![image](https://github.com/user-attachments/assets/f6331e8b-24c2-4554-937f-89f4c1f89b6f)
+
 4. Enter ssh address
-   ![image](https://github.com/user-attachments/assets/6cb2e589-e0a3-46c7-a8e9-fba3519ab0db)
+
+![image](https://github.com/user-attachments/assets/6cb2e589-e0a3-46c7-a8e9-fba3519ab0db)
+
 5. Select ssh file to update (typically the one of your desktop user, in my case Raphael Nekam)
+
 6. Open SSH connection
-   ![image](https://github.com/user-attachments/assets/c843c3e8-0e5d-42e6-b7c1-620a3ff5a397)
+
+![image](https://github.com/user-attachments/assets/c843c3e8-0e5d-42e6-b7c1-620a3ff5a397)
+
 7. Select OS (Linux)
-   ![image](https://github.com/user-attachments/assets/fa647b7c-839c-4854-bab4-b401edd2f66d)
+
+![image](https://github.com/user-attachments/assets/fa647b7c-839c-4854-bab4-b401edd2f66d)
 
 ### Get IP of Raspberry in network:
 ```
@@ -105,24 +115,30 @@ This could be convenient to access the raspberry from your home network, without
 
 1. Connect to raspberry via ssh (team29@team29.local)
 2. Open WiFi configuration file
-   ```
-   sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
-   ```
-3. Add
-  ```
-   network={
-       ssid="New_WiFi_Name"
-       psk="New_WiFi_Password"
-   }
-   ```
-   If other networks are already present, just add this after the previous one. Please do not remove networks of others. If the network is hidden, further add scan_ssid=1. The file should look like the following, if two networks are present:
-   ![image](https://github.com/user-attachments/assets/d10b41e1-814c-4e3a-964e-06a1c3712f8e)
+```
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+```
+3. Add network credentials
+```
+network={
+    ssid="New_WiFi_Name"
+    psk="New_WiFi_Password"
+}
+```
+
+If other networks are already present, just add this after the previous one. Please do not remove networks of others. If the network is hidden, further add scan_ssid=1. The file should look like the following, if two networks are present:
+
+![image](https://github.com/user-attachments/assets/d10b41e1-814c-4e3a-964e-06a1c3712f8e)
+
 4. Close File by pressing Ctlr + X, then Y, then Enter
+
+
 5. Restart the WiFi service
-   ```
-   sudo wpa_cli -i wlan0 reconfigure
-   ```
-   Or reboot:
-   ```
-   sudo reboot
-   ```
+
+```
+sudo wpa_cli -i wlan0 reconfigure
+```
+Or reboot:
+```
+sudo reboot
+```
