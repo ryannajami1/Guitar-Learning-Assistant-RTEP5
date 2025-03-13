@@ -8,11 +8,14 @@ import {AccuracyComponent} from '../../../widgets/accuracy/accuracy.component';
 import {ToggleSwitchModule} from 'primeng/toggleswitch';
 import {FormsModule} from '@angular/forms';
 import {DialogModule} from 'primeng/dialog';
+import {CorrectChordComponent} from '../../../widgets/correct-chord/correct-chord.component';
+import {WrongChordComponent} from '../../../widgets/wrong-chord/wrong-chord.component';
+import {TimeoutComponent} from '../../../widgets/timeout/timeout.component';
 
 @Component({
   selector: 'app-desktop-practice',
   standalone: true,
-  imports: [DialogModule, ChordSchematicComponent, TimerComponent, ButtonModule, ResponseTimeComponent, LastFiveChordsComponent, AccuracyComponent, ToggleSwitchModule, FormsModule],
+  imports: [DialogModule, CorrectChordComponent, WrongChordComponent, TimeoutComponent, ChordSchematicComponent, TimerComponent, ButtonModule, ResponseTimeComponent, LastFiveChordsComponent, AccuracyComponent, ToggleSwitchModule, FormsModule],
   templateUrl: './desktop-practice.component.html',
   styleUrl: './desktop-practice.component.scss'
 })
@@ -21,6 +24,9 @@ export class DesktopPracticeComponent {
   currentChord: string;
   showChord: boolean = true;
   showSettings: boolean = false;
+  showCorrectChordPlayed: boolean = false;
+  showWrongChordPlayed: boolean = false;
+  showTimeout: boolean = false;
 
   playA: boolean = true;
   playB: boolean = true;

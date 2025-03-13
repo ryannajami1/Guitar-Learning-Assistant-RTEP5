@@ -25,3 +25,8 @@ a {
 p {
   margin: 0;
 }
+
+
+.p-overlay-mask {
+  backdrop-filter: blur(4px) !important; /* Adjust the pixel value for desired blur amount */
+}

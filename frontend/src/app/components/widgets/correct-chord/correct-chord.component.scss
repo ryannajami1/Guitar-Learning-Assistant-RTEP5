@@ -1,0 +1,15 @@
+.icon-grow {
+  animation: growAndShrink 0.5s ease-in-out forwards;
+}
+
+@keyframes growAndShrink {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1); /* Overgrow by 20% */
+  }
+  100% {
+    transform: scale(1);
+  }
+}

@@ -2,6 +2,10 @@
 
   <h4>Practice</h4>
 
+  <button (click)="showCorrectChordPlayed = !showCorrectChordPlayed">Correct</button>
+  <button (click)="showWrongChordPlayed = !showWrongChordPlayed">Wrong</button>
+  <button (click)="showTimeout = !showTimeout">Timeout</button>
+
   <div class="card" style="flex-grow: 1; display: flex; flex-direction: column">
 
     <div style="display: flex; flex-direction: row">
@@ -65,6 +69,24 @@
 
 </div>
 
+<p-dialog [modal]="true" [(visible)]="showCorrectChordPlayed" [style]="{ width: '25rem' }">
+  <ng-template #headless>
+    <app-correct-chord></app-correct-chord>
+  </ng-template>
+</p-dialog>
+
+<p-dialog [modal]="true" [(visible)]="showWrongChordPlayed" [style]="{ width: '25rem' }">
+  <ng-template #headless>
+    <app-wrong-chord></app-wrong-chord>
+  </ng-template>
+</p-dialog>
+
+<p-dialog [modal]="true" [(visible)]="showTimeout" [style]="{ width: '25rem' }">
+  <ng-template #headless>
+    <app-timeout></app-timeout>
+  </ng-template>
+</p-dialog>
+
 <p-dialog header="Settings" [modal]="true" [(visible)]="showSettings" [style]="{ width: '25rem' }">
 
   <h3>Note</h3>
@@ -102,7 +124,6 @@
     <p-toggleswitch [(ngModel)]="playG"/>
     <div (click)="playG = !playG" style="margin-left: 4px; cursor: pointer">Play G</div>
   </div>
-
 
   <h3>Chord Types</h3>
   <div style="display: flex; flex-direction: row">
