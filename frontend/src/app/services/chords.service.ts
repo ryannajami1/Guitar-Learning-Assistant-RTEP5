@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {EChordStatus} from '../models/chord-status.enum';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +9,13 @@ export class ChordsService {
 
   constructor() {
   }
+
+  timerStartValueMs: number = 1000; // in ms
+  timerCurrentValueMs: number = 0; // in ms
+  timerInterval: any;
+
+  private _timerRunning = new BehaviorSubject<boolean>(false);
+  timerRunning$: Observable<boolean> = this._timerRunning.asObservable();
 
   currentChordToBePlayed: string = '';
 
@@ -56,6 +64,11 @@ export class ChordsService {
     }
   }
 
+  getNewCurrentChord(): void {
+    this.currentChordToBePlayed = this.getRandomGuitarChord();
+    this.timerRestart();
+  }
+
   chordEventHandler(status: EChordStatus): void {
     if (status === EChordStatus.Timeout) {
       this.showTimeoutModal = true;
@@ -71,9 +84,38 @@ export class ChordsService {
       this.showCorrectChordModal = false;
       this.showTimeoutModal = false;
       this.showWrongChordModal = false;
-      this.currentChordToBePlayed = this.getRandomGuitarChord();
+      this.getNewCurrentChord();
     }, 1000); // 1000 milliseconds = 1 second
   }
+
+  timerStart(): void {
+    this._timerRunning.next(true);
+    this.timerCurrentValueMs = this.timerStartValueMs;
+
+    this.timerInterval = setInterval(() => {
+      if (this.timerCurrentValueMs <= 0) {
+        this.timerCurrentValueMs = 0;
+        clearInterval(this.timerInterval);
+        this.chordEventHandler(EChordStatus.Timeout)
+      } else {
+        this.timerCurrentValueMs = this.timerCurrentValueMs - 10;
+      }
+    }, 10);
+  }
+
+  timerStop(): void {
+    this._timerRunning.next(false);
+    clearInterval(this.timerInterval);
+  }
+
+  timerRestart(): void {
+    this._timerRunning.next(false);
+    clearInterval(this.timerInterval);
+    setTimeout(() => {
+      this.timerStart();
+    }, 10); // Small delay to ensure the transition is re-enabled
+  }
+
 
   getRandomGuitarChord(): string {
     let notes = [];
