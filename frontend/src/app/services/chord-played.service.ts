@@ -1,46 +1,60 @@
-import { Injectable } from '@angular/core';
-
-
-export enum EChordStatus {
-  Correct = "correct",
-  Wrong = "wrong",
-  Timeout = "timeout",
-  None = "none"
-}
+import {Injectable} from '@angular/core';
+import {EChordStatus} from '../models/chord-status.enum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChordPlayedService {
 
-  constructor() { }
+  constructor() {
+  }
 
-  last5chords: EChordStatus[] = [EChordStatus.None, EChordStatus.None, EChordStatus.None, EChordStatus.None, EChordStatus.None];
+  lastChords: EChordStatus[] = [];
 
   showCorrectChordModal: boolean = false;
   showWrongChordModal: boolean = false;
   showTimeoutModal: boolean = false;
 
+  getAccuracy(): number {
+
+    if (!this.lastChords.length) return 0;
+
+    let accurateCount = 0;
+    for (const chordStatus of this.lastChords) {
+      if (chordStatus === EChordStatus.Correct) {
+        accurateCount++;
+      }
+    }
+    return accurateCount / this.lastChords.length;
+  }
+
+  getLast5Chords(): EChordStatus[] {
+    if (this.lastChords.length >= 5) {
+      return this.lastChords.slice(-5);
+    } else {
+      return this.lastChords;
+    }
+  }
 
   timeoutReached(): void {
     this.showTimeoutModal = true;
-    this.last5chords.shift()
-    this.last5chords.push(EChordStatus.Timeout)
+    this.lastChords.push(EChordStatus.Timeout)
     this.startResetModalTimer();
+    console.log(this.lastChords)
   }
 
   correctChordPlayed(): void {
     this.showCorrectChordModal = true;
-    this.last5chords.shift()
-    this.last5chords.push(EChordStatus.Correct)
+    this.lastChords.push(EChordStatus.Correct)
     this.startResetModalTimer();
+    console.log(this.lastChords)
   }
 
   wrongChordPlayed(): void {
     this.showWrongChordModal = true;
-    this.last5chords.shift()
-    this.last5chords.push(EChordStatus.Wrong)
+    this.lastChords.push(EChordStatus.Wrong)
     this.startResetModalTimer();
+    console.log(this.lastChords)
   }
 
   startResetModalTimer(): void {

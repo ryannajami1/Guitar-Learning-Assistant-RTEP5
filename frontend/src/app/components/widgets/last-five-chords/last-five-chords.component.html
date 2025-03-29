@@ -1,5 +1,11 @@
-<i class="pi pi-check-circle" style="font-size: 1.5rem"></i>
-<i class="pi pi-times-circle" style="font-size: 1.5rem"></i>
-<i class="pi pi-times-circle" style="font-size: 1.5rem"></i>
-<i class="pi pi-minus-circle" style="font-size: 1.5rem"></i>
-<i class="pi pi-check-circle" style="font-size: 1.5rem"></i>
+<div style="display: flex; flex-direction: row"
+     *ngFor="let chordStatus of this.chordPlayedService.getLast5Chords(); let i = index">
+  <div>
+    <i *ngIf="chordStatus === this.EChordStatus.Correct" class="pi pi-check-circle"
+       style="font-size: 1.5rem; display: inline-block;"></i>
+    <i *ngIf="chordStatus === this.EChordStatus.Wrong" class="pi pi-times-circle"
+       style="font-size: 1.5rem; display: inline-block;"></i>
+    <i *ngIf="chordStatus === this.EChordStatus.Timeout" class="pi pi-minus-circle"
+       style="font-size: 1.5rem; display: inline-block;"></i>
+  </div>
+</div>
