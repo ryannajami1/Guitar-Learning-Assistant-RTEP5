@@ -28,6 +28,6 @@ export class DesktopPracticeComponent {
   showSettings: boolean = false;
 
   constructor(public chordPlayedService: ChordsService) {
-    this.chordPlayedService.currentChordToBePlayed = this.chordPlayedService.getRandomGuitarChord();
+    this.chordPlayedService.getNewCurrentChord();
   }
 }
