@@ -4,7 +4,7 @@ import {EChordStatus} from '../models/chord-status.enum';
 @Injectable({
   providedIn: 'root'
 })
-export class ChordPlayedService {
+export class ChordsService {
 
   constructor() {
   }

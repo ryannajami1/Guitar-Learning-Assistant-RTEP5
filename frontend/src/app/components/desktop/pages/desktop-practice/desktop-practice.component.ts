@@ -11,7 +11,7 @@ import {DialogModule} from 'primeng/dialog';
 import {CorrectChordComponent} from '../../../widgets/correct-chord/correct-chord.component';
 import {WrongChordComponent} from '../../../widgets/wrong-chord/wrong-chord.component';
 import {TimeoutComponent} from '../../../widgets/timeout/timeout.component';
-import {ChordPlayedService} from '../../../../services/chord-played.service';
+import {ChordsService} from '../../../../services/chords.service';
 
 @Component({
   selector: 'app-desktop-practice',
@@ -48,7 +48,7 @@ export class DesktopPracticeComponent {
   playAug: boolean = true;
 
 
-  constructor(public chordPlayedService: ChordPlayedService) {
+  constructor(public chordPlayedService: ChordsService) {
     this.currentChord = this.getRandomGuitarChord();
   }
 

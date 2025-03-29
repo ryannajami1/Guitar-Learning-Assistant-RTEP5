@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {ChordPlayedService} from '../../../services/chord-played.service';
+import {ChordsService} from '../../../services/chords.service';
 
 @Component({
   selector: 'app-accuracy',
@@ -9,6 +9,6 @@ import {ChordPlayedService} from '../../../services/chord-played.service';
   styleUrl: './accuracy.component.scss'
 })
 export class AccuracyComponent {
-  constructor(public chordPlayedService: ChordPlayedService) {
+  constructor(public chordsService: ChordsService) {
   }
 }
