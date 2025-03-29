@@ -38,6 +38,7 @@ export class ChordsService {
   chordGenerationIncludeAug: boolean = true;
 
   lastChords: EChordStatus[] = [];
+  lastResponseTimes: number [] = [];
 
   showCorrectChordModal: boolean = false;
   showWrongChordModal: boolean = false;
@@ -64,12 +65,25 @@ export class ChordsService {
     }
   }
 
+  getResponseTimeAvg(): number {
+    if (!this.lastResponseTimes.length) return 0;
+
+    let sum = 0;
+    for (const responseTime of this.lastResponseTimes) {
+      sum += responseTime;
+    }
+    return sum / this.lastResponseTimes.length;
+  }
+
   getNewCurrentChord(): void {
     this.currentChordToBePlayed = this.getRandomGuitarChord();
     this.timerRestart();
   }
 
   chordEventHandler(status: EChordStatus): void {
+    this.timerStop();
+    this.lastResponseTimes.push(this.timerStartValueMs - this.timerCurrentValueMs);
+
     if (status === EChordStatus.Timeout) {
       this.showTimeoutModal = true;
       this.lastChords.push(EChordStatus.Timeout)
@@ -80,6 +94,8 @@ export class ChordsService {
       this.showWrongChordModal = true;
       this.lastChords.push(EChordStatus.Wrong)
     }
+
+
     setTimeout(() => {
       this.showCorrectChordModal = false;
       this.showTimeoutModal = false;
@@ -98,9 +114,9 @@ export class ChordsService {
         clearInterval(this.timerInterval);
         this.chordEventHandler(EChordStatus.Timeout)
       } else {
-        this.timerCurrentValueMs = this.timerCurrentValueMs - 10;
+        this.timerCurrentValueMs = this.timerCurrentValueMs - 50;
       }
-    }, 10);
+    }, 50);
   }
 
   timerStop(): void {
