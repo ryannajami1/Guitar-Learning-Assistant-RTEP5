@@ -2,9 +2,9 @@
 
   <h4>Practice</h4>
 
-  <button (click)="showCorrectChordPlayed = !showCorrectChordPlayed">Correct</button>
-  <button (click)="showWrongChordPlayed = !showWrongChordPlayed">Wrong</button>
-  <button (click)="showTimeout = !showTimeout">Timeout</button>
+  <button (click)="this.chordPlayedService.correctChordPlayed()">Correct</button>
+  <button (click)="this.chordPlayedService.wrongChordPlayed()">Wrong</button>
+  <button (click)="this.chordPlayedService.timeoutReached()">Timeout</button>
 
   <div class="card" style="flex-grow: 1; display: flex; flex-direction: column">
 
@@ -69,19 +69,19 @@
 
 </div>
 
-<p-dialog [modal]="true" [(visible)]="showCorrectChordPlayed" [style]="{ width: '25rem' }">
+<p-dialog [modal]="true" [(visible)]="this.chordPlayedService.showCorrectChordModal" [style]="{ width: '25rem' }">
   <ng-template #headless>
     <app-correct-chord></app-correct-chord>
   </ng-template>
 </p-dialog>
 
-<p-dialog [modal]="true" [(visible)]="showWrongChordPlayed" [style]="{ width: '25rem' }">
+<p-dialog [modal]="true" [(visible)]="this.chordPlayedService.showWrongChordModal" [style]="{ width: '25rem' }">
   <ng-template #headless>
     <app-wrong-chord></app-wrong-chord>
   </ng-template>
 </p-dialog>
 
-<p-dialog [modal]="true" [(visible)]="showTimeout" [style]="{ width: '25rem' }">
+<p-dialog [modal]="true" [(visible)]="this.chordPlayedService.showTimeoutModal" [style]="{ width: '25rem' }">
   <ng-template #headless>
     <app-timeout></app-timeout>
   </ng-template>
