@@ -1,16 +1,22 @@
 import {Injectable} from '@angular/core';
 import {EChordStatus} from '../models/chord-status.enum';
 import {BehaviorSubject, Observable} from 'rxjs';
+import {ChordGenerationSettings, defaultChordGenerationSettings} from '../models/chord-generation-settings.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChordsService {
 
+
   constructor() {
+    let chordGenerationSettings = sessionStorage.getItem('chordGenerationSettings');
+    if (chordGenerationSettings) {
+      this.chordGenerationSettings = JSON.parse(chordGenerationSettings);
+    }
   }
 
-  timerStartValueMs: number = 1000; // in ms
+  timerStartValueMs: number = 5000; // in ms
   timerCurrentValueMs: number = 0; // in ms
   timerInterval: any;
 
@@ -19,23 +25,7 @@ export class ChordsService {
 
   currentChordToBePlayed: string = '';
 
-  chordGenerationIncludeA: boolean = true;
-  chordGenerationIncludeB: boolean = true;
-  chordGenerationIncludeC: boolean = true;
-  chordGenerationIncludeD: boolean = true;
-  chordGenerationIncludeE: boolean = true;
-  chordGenerationIncludeF: boolean = true;
-  chordGenerationIncludeG: boolean = true;
-
-  chordGenerationIncludeStandard: boolean = true;
-  chordGenerationIncludeMaj: boolean = true;
-  chordGenerationIncludeMin: boolean = true;
-  chordGenerationInclude7: boolean = true;
-  chordGenerationIncludeMaj7: boolean = true;
-  chordGenerationIncludeMin7: boolean = true;
-  chordGenerationIncludeSus4: boolean = true;
-  chordGenerationIncludeDim: boolean = true;
-  chordGenerationIncludeAug: boolean = true;
+  chordGenerationSettings: ChordGenerationSettings = defaultChordGenerationSettings;
 
   lastChords: EChordStatus[] = [];
   lastResponseTimes: number [] = [];
@@ -136,55 +126,55 @@ export class ChordsService {
   getRandomGuitarChord(): string {
     let notes = [];
 
-    if (this.chordGenerationIncludeA) {
+    if (this.chordGenerationSettings.notes.A) {
       notes.push('A');
     }
-    if (this.chordGenerationIncludeB) {
+    if (this.chordGenerationSettings.notes.B) {
       notes.push('B');
     }
-    if (this.chordGenerationIncludeC) {
+    if (this.chordGenerationSettings.notes.C) {
       notes.push('C');
     }
-    if (this.chordGenerationIncludeD) {
+    if (this.chordGenerationSettings.notes.D) {
       notes.push('D');
     }
-    if (this.chordGenerationIncludeE) {
+    if (this.chordGenerationSettings.notes.E) {
       notes.push('E');
     }
-    if (this.chordGenerationIncludeF) {
+    if (this.chordGenerationSettings.notes.F) {
       notes.push('F');
     }
-    if (this.chordGenerationIncludeG) {
+    if (this.chordGenerationSettings.notes.G) {
       notes.push('G');
     }
 
     let chordTypes = [];
 
-    if (this.chordGenerationIncludeStandard) {
+    if (this.chordGenerationSettings.types.standard) {
       chordTypes.push('');
     }
-    if (this.chordGenerationIncludeMaj) {
+    if (this.chordGenerationSettings.types.maj) {
       chordTypes.push('maj');
     }
-    if (this.chordGenerationIncludeMin) {
+    if (this.chordGenerationSettings.types.min) {
       chordTypes.push('min');
     }
-    if (this.chordGenerationInclude7) {
+    if (this.chordGenerationSettings.types.seven) {
       chordTypes.push('7');
     }
-    if (this.chordGenerationIncludeMaj7) {
+    if (this.chordGenerationSettings.types.maj7) {
       chordTypes.push('maj7');
     }
-    if (this.chordGenerationIncludeMin7) {
+    if (this.chordGenerationSettings.types.min7) {
       chordTypes.push('min7');
     }
-    if (this.chordGenerationIncludeSus4) {
+    if (this.chordGenerationSettings.types.sus4) {
       chordTypes.push('sus4');
     }
-    if (this.chordGenerationIncludeDim) {
+    if (this.chordGenerationSettings.types.dim) {
       chordTypes.push('dim');
     }
-    if (this.chordGenerationIncludeAug) {
+    if (this.chordGenerationSettings.types.aug) {
       chordTypes.push('aug');
     }
 
