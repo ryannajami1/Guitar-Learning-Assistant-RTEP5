@@ -30,4 +30,15 @@ export class DesktopPracticeComponent {
   constructor(public chordPlayedService: ChordsService) {
     this.chordPlayedService.getNewCurrentChord();
   }
+
+  openSettings(): void {
+    this.showSettings = true;
+    this.chordPlayedService.timerStop();
+  }
+
+  onSettingsClose(event: any): void {
+    sessionStorage.setItem('chordGenerationSettings', JSON.stringify(this.chordPlayedService.chordGenerationSettings));
+
+    this.chordPlayedService.getNewCurrentChord();
+  }
 }

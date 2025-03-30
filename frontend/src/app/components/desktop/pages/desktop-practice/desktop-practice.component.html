@@ -21,7 +21,7 @@
         </div>
         <div (click)="showChord = !showChord" style="margin-left: 4px; margin-right: 32px; cursor: pointer">Show chord
         </div>
-        <p-button (click)="showSettings = true" label="Settings"></p-button>
+        <p-button (click)="openSettings()" label="Settings"></p-button>
       </div>
     </div>
 
@@ -89,88 +89,88 @@
   </ng-template>
 </p-dialog>
 
-<p-dialog header="Settings" [modal]="true" [(visible)]="showSettings" [style]="{ width: '25rem' }">
+<p-dialog header="Settings" [modal]="true" [(visible)]="showSettings" [style]="{ width: '25rem' }" (onHide)="onSettingsClose($event)">
 
   <h3>Note</h3>
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeA"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeA = !chordPlayedService.chordGenerationIncludeA" style="margin-left: 4px; cursor: pointer">Play A</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.notes.A"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.notes.A = !chordPlayedService.chordGenerationSettings.notes.A" style="margin-left: 4px; cursor: pointer">Play A</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeB"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeB = !chordPlayedService.chordGenerationIncludeB" style="margin-left: 4px; cursor: pointer">Play B</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.notes.B"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.notes.B = !chordPlayedService.chordGenerationSettings.notes.B" style="margin-left: 4px; cursor: pointer">Play B</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeC"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeC = !chordPlayedService.chordGenerationIncludeC" style="margin-left: 4px; cursor: pointer">Play C</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.notes.C"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.notes.C = !chordPlayedService.chordGenerationSettings.notes.C" style="margin-left: 4px; cursor: pointer">Play C</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeD"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeD = !chordPlayedService.chordGenerationIncludeD" style="margin-left: 4px; cursor: pointer">Play D</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.notes.D"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.notes.D = !chordPlayedService.chordGenerationSettings.notes.D" style="margin-left: 4px; cursor: pointer">Play D</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeE"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeE = !chordPlayedService.chordGenerationIncludeE" style="margin-left: 4px; cursor: pointer">Play E</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.notes.E"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.notes.E = !chordPlayedService.chordGenerationSettings.notes.E" style="margin-left: 4px; cursor: pointer">Play E</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeF"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeF = !chordPlayedService.chordGenerationIncludeF" style="margin-left: 4px; cursor: pointer">Play F</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.notes.F"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.notes.F = !chordPlayedService.chordGenerationSettings.notes.F" style="margin-left: 4px; cursor: pointer">Play F</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeG"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeG = !chordPlayedService.chordGenerationIncludeG" style="margin-left: 4px; cursor: pointer">Play G</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.notes.G"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.notes.G = !chordPlayedService.chordGenerationSettings.notes.G" style="margin-left: 4px; cursor: pointer">Play G</div>
   </div>
 
   <h3>Chord Types</h3>
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeStandard"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeStandard = !chordPlayedService.chordGenerationIncludeStandard" style="margin-left: 4px; cursor: pointer">Play standard</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.standard"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.standard = !chordPlayedService.chordGenerationSettings.types.standard" style="margin-left: 4px; cursor: pointer">Play standard</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeMaj"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeMaj = !chordPlayedService.chordGenerationIncludeMaj" style="margin-left: 4px; cursor: pointer">Play maj</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.maj"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.maj = !chordPlayedService.chordGenerationSettings.types.maj" style="margin-left: 4px; cursor: pointer">Play maj</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeMin"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeMin = !chordPlayedService.chordGenerationIncludeMin" style="margin-left: 4px; cursor: pointer">Play min</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.min"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.min = !chordPlayedService.chordGenerationSettings.types.min" style="margin-left: 4px; cursor: pointer">Play min</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationInclude7"/>
-    <div (click)="chordPlayedService.chordGenerationInclude7 = !chordPlayedService.chordGenerationInclude7" style="margin-left: 4px; cursor: pointer">Play 7</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.seven"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.seven = !chordPlayedService.chordGenerationSettings.types.seven" style="margin-left: 4px; cursor: pointer">Play 7</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeMaj7"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeMaj7 = !chordPlayedService.chordGenerationIncludeMaj7" style="margin-left: 4px; cursor: pointer">Play maj7</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.maj7"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.maj7 = !chordPlayedService.chordGenerationSettings.types.maj7" style="margin-left: 4px; cursor: pointer">Play maj7</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeMin7"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeMin7 = !chordPlayedService.chordGenerationIncludeMin7" style="margin-left: 4px; cursor: pointer">Play min7</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.min7"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.min7 = !chordPlayedService.chordGenerationSettings.types.min7" style="margin-left: 4px; cursor: pointer">Play min7</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeSus4"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeSus4 = !chordPlayedService.chordGenerationIncludeSus4" style="margin-left: 4px; cursor: pointer">Play sus4</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.sus4"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.sus4 = !chordPlayedService.chordGenerationSettings.types.sus4" style="margin-left: 4px; cursor: pointer">Play sus4</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeDim"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeDim = !chordPlayedService.chordGenerationIncludeDim" style="margin-left: 4px; cursor: pointer">Play dim</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.dim"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.dim = !chordPlayedService.chordGenerationSettings.types.dim" style="margin-left: 4px; cursor: pointer">Play dim</div>
   </div>
 
   <div style="display: flex; flex-direction: row">
-    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationIncludeAug"/>
-    <div (click)="chordPlayedService.chordGenerationIncludeAug = !chordPlayedService.chordGenerationIncludeAug" style="margin-left: 4px; cursor: pointer">Play aug</div>
+    <p-toggleswitch [(ngModel)]="chordPlayedService.chordGenerationSettings.types.aug"/>
+    <div (click)="chordPlayedService.chordGenerationSettings.types.aug != chordPlayedService.chordGenerationSettings.types.aug" style="margin-left: 4px; cursor: pointer">Play aug</div>
   </div>
 
 </p-dialog>
