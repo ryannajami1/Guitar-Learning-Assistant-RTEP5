@@ -114,7 +114,28 @@ map<vector<int>, string> triad_chord_table = {
     // Sus4
     // Notes:       1-4-5-8
     // Intervals:    5,2,5
-    {{5,2,5}, "Sus4"}
+    {{5,2,5}, "Sus4"},
+    // Dominant 7
+    // Notes:       1-3-5-m7-8
+    // Intervals:    4,3,3,2
+    {{4,3,3,2}, "7"},
+    // Major 7
+    // Notes:       1-3-5-7-8
+    // Intervals:    4,3,4,1
+    {{4,3,4,1}, "Major 7"},
+    // Minor 7
+    // Notes:       1-m3-5-m7-8
+    // Intervals:    3, 4,3, 2
+    {{3,4,3,2}, "Minor 7"},
+    // Major 6
+    // Notes:       1-3-5-6-8
+    // Intervals:    4,3,2,3
+    {{4,3,4,1}, "Major 6"},
+    // Minor 6
+    // Notes:       1-m3-5-m6-8
+    // Intervals:    4, 3,1, 4
+    {{4,3,4,1}, "Minor 6"}
+
 };
 
 // string ChordDetection::ChordLookup(vector<int> notes, int root) {
@@ -142,6 +163,13 @@ string ChordDetection::ChordLookup(vector<int> notes) {
     auto root_it = find(notes_set.begin(), notes_set.end(), root);
     rotate(notes_set.begin(), root_it, notes_set.end());
 
+    // Print notes_set for debugging
+    cout << "Notes set: ";
+    for (int note : notes_set) {
+        cout << note << " ";
+    }
+    cout << endl;
+
     // Get the intervals between each note.
     vector<int> intervals;
     int len = notes_set.size();
@@ -150,6 +178,13 @@ string ChordDetection::ChordLookup(vector<int> notes) {
         if (interval < 0) interval += 12;
         intervals.push_back(interval);
     }
+
+    // Print intervals for debugging
+    cout << "Intervals: ";
+    for (int interval : intervals) {
+        cout << interval << " ";
+    }
+    cout << endl;
 
     // Find intervals and match chord
     string chord_type = triad_chord_table[intervals];

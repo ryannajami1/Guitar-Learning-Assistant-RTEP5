@@ -147,6 +147,7 @@ int test_chord_lookup() {
     ChordDetection cd;
 
     vector<pair<string, vector<string>>> chord_test_data = {
+        // Triads -----------------------------------
         {
             "E Major",
             {"E2","B2","E3","G#3","B3","E4"}
@@ -165,6 +166,23 @@ int test_chord_lookup() {
         },{
             "F Diminished",
             {"F3","B3","F4","G#4"}
+        },
+        // 4 Note Chords ---------------------------
+        {
+            "C 7",
+            {"C3","G3","C4","E4","A#4"}
+        },{
+            "C Major 7",
+            {"C3","G3","C4","E4","B4"}
+        },{
+            "C Minor 7",
+            {"C3","G3","C4","D#4","A#4"}
+        },{
+            "F Major 6",
+            {"F3","C4","A4","D4"}
+        },{
+            "F Minor 6",
+            {"F3","C4","A4","C#4"}
         }
     };
 
