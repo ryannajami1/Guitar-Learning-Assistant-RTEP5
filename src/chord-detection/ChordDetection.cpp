@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <vector>
 #include <string>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <array>
@@ -120,6 +121,7 @@ map<vector<int>, string> triad_chord_table = {
 string ChordDetection::ChordLookup(vector<int> notes) {
     // Find the root note
     int root = notes[0] % 12;
+    if (root < 0) root += 12;
 
     // Convert notes numbers to indexes
     vector<int> notes_set = notes;
@@ -142,14 +144,12 @@ string ChordDetection::ChordLookup(vector<int> notes) {
 
     // Get the intervals between each note.
     vector<int> intervals;
-    for (size_t i = 1; i < notes.size(); i++) {
-        int interval = notes[i] - notes[i - 1];
+    int len = notes_set.size();
+    for (size_t i = 1; i <= len; i++) {
+        int interval = notes_set[i % len] - notes_set[i - 1];
         if (interval < 0) interval += 12;
         intervals.push_back(interval);
     }
-
-    // Add the interval to the octave as well
-    intervals.push_back(12 - notes[notes.size() - 1]);
 
     // Find intervals and match chord
     string chord_type = triad_chord_table[intervals];
