@@ -55,8 +55,9 @@ int test_note_lookup() {
     };
 
     for (const auto& note : noteFrequencies) {
-        if (cd.NoteLookup(note.second) != note.first) {
-            cout << note.first << " | " << cd.NoteLookup(note.second);
+        string note_name = cd.NoteName(cd.NoteNumber(note.second));
+        if (note_name != note.first) {
+            cout << note.first << " | " << note_name;
             cerr << "Note Lookup failed :(((\n";
             return 1;
         }
@@ -101,7 +102,7 @@ int test_fft_data() {
 
     file.close();
 
-    // Get the magnitude column
+    // Get the magnitude column 
     vector<float> fft_magnitude;
     for (vector<float> row : fft_data) {
         fft_magnitude.push_back(row[1]);

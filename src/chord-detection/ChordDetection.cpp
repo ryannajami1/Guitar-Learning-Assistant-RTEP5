@@ -5,7 +5,9 @@
 #include <sstream>
 #include <array>
 #include <cmath>
+#include <algorithm>
 #include "ChordDetection.hpp"
+#include <map>
 
 using namespace std;
 
@@ -66,13 +68,95 @@ float ChordDetection::CalculateNoiseFloor(const vector<float> &data) {
     return sum / data.size();
 }
 
-string ChordDetection::NoteLookup(float frequency) {
+string ChordDetection::NoteName(int note_num) {
     vector<string> notes = {"A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"};
-
-    int note_index = static_cast<int>(round(12 * log2(frequency / 440.0))) % 12;
+    
+    int note_index = note_num % 12;
 
     if (note_index < 0) {
         note_index += 12;
     }
     return notes[note_index];
+}
+
+int ChordDetection::NoteNumber(float frequency) {
+    int note_number = static_cast<int>(round(12 * log2(frequency / 440.0)));
+    return note_number;
+}
+
+/* Chord Reference
+ * Note:    1, m2, M2, m3, M3,  4, a4,  5, m6, M6, m7, M7,  8
+ * Steps:   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12
+*/
+
+map<vector<int>, string> triad_chord_table = {
+    // Major
+    // Notes:       1-3-5-8
+    // Intervals:    4,3,5
+    {{4,3,5}, "Major"},
+    // Minor
+    // Notes:       1-m3-5-8
+    // Intervals:    3,4,5
+    {{3,4,5}, "Minor"},
+    // Diminished
+    // Notes:       1-m3-m5-8
+    // Intervals:    3,3,6
+    {{3,3,6}, "Diminished"},
+    // Augmented
+    // Notes:       1-3-#5(m6)-8
+    // Intervals:    4,4,4
+    {{4,4,4}, "Augmented"},
+    // Sus2
+    // Notes:       1-2-5-8
+    // Intervals:    2,5,5
+    {{2,5,5}, "Sus2"},
+    // Sus4
+    // Notes:       1-4-5-8
+    // Intervals:    5,2,5
+    {{5,2,5}, "Sus4"}
+};
+
+// string ChordDetection::ChordLookup(vector<int> notes, int root) {
+string ChordDetection::ChordLookup(vector<int> notes) {
+    // Find the root note
+    int root = notes[0] % 12;
+
+    // Convert notes numbers to indexes
+    vector<int> notes_set = notes;
+
+    for (size_t i = 0; i < notes_set.size(); i++) {
+        int note_index = notes_set[i] % 12;
+        if (note_index < 0) {
+            note_index += 12;
+        }
+        notes_set[i] = note_index;
+    }
+
+    // Remove duplicates and sort
+    sort(notes_set.begin(), notes_set.end());
+    notes_set.erase(unique(notes_set.begin(), notes_set.end()), notes_set.end());
+
+    // Rotate to put root note first
+    auto root_it = find(notes_set.begin(), notes_set.end(), root);
+    rotate(notes_set.begin(), root_it, notes_set.end());
+
+    // Get the intervals between each note.
+    vector<int> intervals;
+    for (size_t i = 1; i < notes.size(); i++) {
+        int interval = notes[i] - notes[i - 1];
+        if (interval < 0) interval += 12;
+        intervals.push_back(interval);
+    }
+
+    // Add the interval to the octave as well
+    intervals.push_back(12 - notes[notes.size() - 1]);
+
+    // Find intervals and match chord
+    string chord_type = triad_chord_table[intervals];
+    string root_note = ChordDetection::NoteName(root);
+    string chord_name = root_note + " " + chord_type;
+
+    return chord_name;
+
+    // If fails, ignore root and try matching again.
 }
