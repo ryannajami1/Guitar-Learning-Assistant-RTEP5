@@ -130,11 +130,11 @@ map<vector<int>, string> triad_chord_table = {
     // Major 6
     // Notes:       1-3-5-6-8
     // Intervals:    4,3,2,3
-    {{4,3,4,1}, "Major 6"},
+    {{4,3,2,3}, "Major 6"},
     // Minor 6
     // Notes:       1-m3-5-m6-8
     // Intervals:    4, 3,1, 4
-    {{4,3,4,1}, "Minor 6"}
+    {{3,4,2,3}, "Minor 6"}
 
 };
 
