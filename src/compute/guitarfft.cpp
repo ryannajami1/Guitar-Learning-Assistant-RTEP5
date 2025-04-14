@@ -10,6 +10,7 @@
 #include <memory>
 #include <thread>
 #include <array>
+#include "audio_input.hpp"
 
 AudioInput in;
 
@@ -308,8 +309,8 @@ int main() {
     for (int frame = 0; frame < 100; frame++) {
         // Generate one frame of sine wave
         for (int i = 0; i < FRAMES; i++) {
-            double t = (frame * FRAMES + i) / sample_rate;
-            test_frame[i] = static_cast<short>(amplitude * sin(2.0 * M_PI * frequency * t));
+            double t = (frame * FRAMES + i) / this->sample_rate;
+            test_frame[i] = static_cast<short>(this->amplitude * sin(2.0 * M_PI * this->frequency * t));
         }
         
         // Add the frame to the processor
