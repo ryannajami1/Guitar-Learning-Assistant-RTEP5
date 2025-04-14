@@ -186,6 +186,8 @@ public:
         if (frames_collected >= frames_to_collect) {
             // Process the collected frames
             process_frames();
+
+            // Finlay
             
             // Reset frame counter but keep the buffer position
             // (this creates a sliding window effect)
@@ -211,6 +213,7 @@ public:
         
         // Find frequency peaks
         find_frequency_peaks();
+        print_frequency_peaks();
     }
     
     // Get frequency peaks for chord detection
