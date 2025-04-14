@@ -1,4 +1,4 @@
-#include <fftw3.h>
+#include "fftw3.h"
 #include <vector>
 #include <cmath>
 #include <iostream>
@@ -11,8 +11,6 @@
 #include <thread>
 #include <array>
 #include "audio_input.hpp"
-
-AudioInput in;
 
 #define FRAMES 128
 
@@ -65,7 +63,7 @@ private:
     }
     
     // Find peaks in the frequency spectrum
-    void find_frequency_peaks(float threshold_percent = 5.0f, int max_peaks = 10) {
+    void find_frequency_peaks(float threshold_percent = 5.0f, std::size_t max_peaks = 10) {
         frequency_peaks.clear();
         
         // Calculate maximum magnitude for threshold calculation
@@ -128,15 +126,15 @@ public:
     GuitarFFTProcessor(unsigned int frame_size = FRAMES, 
                        unsigned int rate = 2000,
                        unsigned int frames_to_process = FRAMES) 
-    : samples_per_frame(frame_size),
+    : fft_size(frame_size * frames_to_process),
       sample_rate(rate),
+      samples_per_frame(frame_size),
       frames_to_collect(frames_to_process),
-      fft_size(frame_size * frames_to_process),
+      input_buffer(nullptr),
+      output_buffer(nullptr), 
       frame_buffer(frame_size * frames_to_process),
       buffer_position(0),
-      frames_collected(0),
-      input_buffer(nullptr),
-      output_buffer(nullptr) {
+      frames_collected(0) {
     }
     
     ~GuitarFFTProcessor() {
@@ -172,9 +170,9 @@ public:
     }
     
     // Add a frame to the buffer and process if we have enough frames
-    bool add_frame(const short* frame) {
+    void add_frame(std::array<int16_t, FRAMES>& frame) {
         // Copy the frame into buffer
-        std::memcpy(frame_buffer.data() + buffer_position, frame, samples_per_frame * sizeof(short));
+        std::memcpy(frame_buffer.data() + buffer_position, frame.begin(), samples_per_frame * sizeof(int16_t));
         
         // Update position and frame count
         buffer_position += samples_per_frame;
@@ -193,10 +191,10 @@ public:
             // (this creates a sliding window effect)
             frames_collected = frames_to_collect / 2; // 50% overlap
             
-            return true; // Indicate that processing occurred
+            // return true; // Indicate that processing occurred
         }
         
-        return false; // Indicate that we're still collecting frames
+        // return false; // Indicate that we're still collecting frames
     }
     
     // Process the collected frames
@@ -292,6 +290,7 @@ int main() {
     // Create processor for Sampled frames at 2kHz
     // Will collect frames (total 1024 samples) before processing
     GuitarFFTProcessor processor(FRAMES, 2000, FRAMES);
+    AudioInput in;
     
     // Initialize the processor
     if (!processor.initialize()) {
@@ -299,31 +298,15 @@ int main() {
         return 1;
     }
     
-    in.register_callback(callback);
-    in.init();
-    std::thread t(in.start_loop);
-    
-    
+    in.register_callback([&processor](auto frame) {
+        processor.add_frame(frame);
+    });
 
-        // Process 100 frames (more than needed to trigger FFT processing)
-    for (int frame = 0; frame < 100; frame++) {
-        // Generate one frame of sine wave
-        for (int i = 0; i < FRAMES; i++) {
-            double t = (frame * FRAMES + i) / this->sample_rate;
-            test_frame[i] = static_cast<short>(this->amplitude * sin(2.0 * M_PI * this->frequency * t));
-        }
-        
-        // Add the frame to the processor
-        bool processed = processor.add_frame(test_frame.data());
-        
-        // If processing occurred, print the results
-        if (processed) {
-            std::cout << "Processed after frame " << frame << std::endl;
-            processor.print_frequency_peaks();
-        }
-    }
+    in.init();
+
+    std::thread t([&in]() {in.start_loop();});
     
-t.join();
+    t.join();
 
     return 0;
 }
