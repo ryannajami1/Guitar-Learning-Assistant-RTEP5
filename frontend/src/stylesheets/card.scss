@@ -1,0 +1,12 @@
+.card {
+  background: white;
+  padding: 24px 32px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  margin-bottom: 32px;
+  flex-grow: 1;
+
+  & + .card {
+    margin-left: 32px; // Add margin if followed by another card
+  }
+}

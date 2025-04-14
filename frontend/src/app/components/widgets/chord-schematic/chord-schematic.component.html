@@ -1,0 +1,10 @@
+<script type="text/javascript" src="../../../../../public/assets/raphael.js"></script>
+<script type="text/javascript" src="../../../../../public/assets/raphael.chord.js"></script>
+
+<div>
+  <div id="chord-container" [class.blur]="!showChord"></div>
+  <div class="overlay-text" *ngIf="!showChord">
+    <div style="font-weight: 500; font-size: 1.2rem">Chord hidden</div>
+    <div class="click-to-show" (click)="currentChordChange.next()">click to show</div>
+  </div>
+</div>

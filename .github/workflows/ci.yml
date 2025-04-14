@@ -24,8 +24,8 @@ jobs:
 
       - name: Build
         run: |
-          chmod +x build.sh
-          ./build.sh 2>&1 | tee output.log
+          chmod +x compile.sh
+          ./compile.sh 2>&1 | tee output.log
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/primebox",
+            "outputPath": "dist/guitar-trainer-angular-app",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -32,9 +32,13 @@
               }
             ],
             "styles": [
-              "src/stylesheets/styles.scss"
+              "src/stylesheets/styles.scss",
+              "src/stylesheets/card.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "public/assets/raphael.js",
+              "public/assets/raphael.chord.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -91,9 +95,13 @@
               }
             ],
             "styles": [
-              "src/stylesheets/styles.scss"
+              "src/stylesheets/styles.scss",
+              "src/stylesheets/card.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "public/assets/raphael.js",
+              "public/assets/raphael.chord.js"
+            ]
           }
         }
       }
