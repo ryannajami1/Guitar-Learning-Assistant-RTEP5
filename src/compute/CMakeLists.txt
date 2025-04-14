@@ -9,8 +9,10 @@
 find_library(FFTW_LIB fftw3f REQUIRED)
 include_directories(/usr/include)
 
+find_package(ALSA REQUIRED)
+
 add_executable(guitarfft guitarfft.cpp)
 
 target_include_directories(guitarfft PRIVATE ../input)
-target_link_libraries(guitarfft audio_input ${FFTW_LIB} -lm)
+target_link_libraries(guitarfft audio_input asound ${FFTW_LIB} -lm)
 
