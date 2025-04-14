@@ -8,6 +8,10 @@
 #include <iomanip>
 #include <cstring>
 #include <memory>
+#include <thread>
+#include <array>
+
+AudioInput in;
 
 #define FRAMES 128
 
@@ -282,10 +286,7 @@ public:
     }
 };
 
-/**
- * Example main function showing how to use the FFT processor
- * with sample frames from ALSA
- */
+
 int main() {
     // Create processor for Sampled frames at 2kHz
     // Will collect frames (total 1024 samples) before processing
@@ -297,15 +298,13 @@ int main() {
         return 1;
     }
     
-    // Simulate receiving frames from ALSA (1 frame = No. of samples)
-    std::vector<short> test_frame(FRAMES);
+    in.register_callback(callback);
+    in.init();
+    std::thread t(in.start_loop);
     
-    // Generate a 440Hz sine wave (A4 note)
-    double amplitude = 10000.0;
-    double frequency = 440.0;
-    double sample_rate = 2000.0;
     
-    // Process 100 frames (more than needed to trigger FFT processing)
+
+        // Process 100 frames (more than needed to trigger FFT processing)
     for (int frame = 0; frame < 100; frame++) {
         // Generate one frame of sine wave
         for (int i = 0; i < FRAMES; i++) {
@@ -323,5 +322,7 @@ int main() {
         }
     }
     
+t.join();
+
     return 0;
 }
