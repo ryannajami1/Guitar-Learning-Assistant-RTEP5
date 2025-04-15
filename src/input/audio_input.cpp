@@ -19,6 +19,7 @@
 #include <functional>
 #include <iostream>
 #include <cstdint>
+#include <thread>
 
 /* Init 
  *
@@ -114,23 +115,27 @@ void AudioInput::start_loop()
     while (!done){
     	// read samples in from buffer
     	// the snd_pcm_readi() function is blocking and reads in interleaved data
-	// the sound device is configured for mono, so only 1 channel is actually read in
+	    // the sound device is configured for mono, so only 1 channel is actually read in
     	rc = snd_pcm_readi(handle, buffer, frames);
     	if (rc == -EPIPE) {
         	// EPIPE means overrun in the ALSA buffer
 	        fprintf(stderr, "overrun occurred\n");
         	snd_pcm_prepare(handle);
-	} else if (rc < 0) {
-		fprintf(stderr, "error from read: %s\n", snd_strerror(rc));
-	} else if (rc != (int)frames) {
-        	fprintf(stderr, "short read, read %d frames\n", rc);
-	}
+        } else if (rc < 0) {
+            fprintf(stderr, "error from read: %s\n", snd_strerror(rc));
+        } else if (rc != (int)frames) {
+            fprintf(stderr, "short read, read %d frames\n", rc);
+        }
 
-	// copy the buffer into C++ array object
-	std::copy(buffer, buffer+size, sample_array.begin());
+        // copy the buffer into C++ array object
+        std::copy(buffer, buffer+size, sample_array.begin());
 
-	// call the callback function with the new data
-	callback_function(sample_array);
+        // call the callback function with the new data in a new thread
+        std::thread thr(callback_function, sample_array);
+
+        // allow the thread to run with the signal processing
+        // loop will return to the blocking ALSA read
+        thr.detach();
     }
 }
 

@@ -7,19 +7,14 @@
 #include <cstdint>
 
 constexpr size_t sample_array_size = 128;
-typedef std::function<void(std::array<uint16_t, sample_array_size>)> cb_t;
 
 class AudioInput{
 public:
-    // AudioInput();
-    // ~AudioInput();
-
     void init();
     void start_loop();
     void stop_loop();
     void close();
 
-    void input_loop();
     void register_callback(std::function<void(std::array<int16_t, sample_array_size>&)> new_callback);
 
 private:
