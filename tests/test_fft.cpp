@@ -1,14 +1,15 @@
-#include "../src/compute/guitarfft.cpp"
+#include "../src/compute/guitarfft.hpp"
 #include <cmath>
 #include <vector>
 #include <array>
+#include <iostream>
 
 // Function to generate a sine wave at a specific frequency
 void GenerateSineWave(std::array<int16_t, FRAMES> &buffer, float frequency,
                       float amplitude, float sample_rate) {
   for (size_t i = 0; i < buffer.size(); i++) {
     float time = static_cast<float>(i) / sample_rate;
-    float value = amplitude * sin(2.0F * M_PI * frequency * time);
+    double value = amplitude * sin(2.0F * M_PI *static_cast<double>(frequency) *static_cast<double>(time));
     buffer[i] = static_cast<int16_t>(value);
   }
 }
@@ -76,7 +77,7 @@ auto main() -> int {
     const float sample_rate = 2000.0F;
 
     // Initialize FFT processor
-    GuitarFFTProcessor processor(FRAMES, sample_rate, FRAMES);
+    GuitarFFTProcessor processor(FRAMES, static_cast<unsigned int>(sample_rate), FRAMES);
     if (!processor.Initialize()) {
         std::cerr << "Failed to initialize FFT processor" << std::endl;
         return 1;
