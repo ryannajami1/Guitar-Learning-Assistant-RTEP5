@@ -6,7 +6,7 @@ import {Observable, Subject} from 'rxjs';
 })
 export class WsService {
 
-  SOCKET_URL: string = "ws://192.168.1.127:9001" ;// MOVE THIS TO ENVIRONMENT
+  SOCKET_URL: string = "ws://192.168.52.229:9000" ;// MOVE THIS TO ENVIRONMENT
   private websocket: WebSocket;
   private messages: Subject<any> = new Subject();
 
