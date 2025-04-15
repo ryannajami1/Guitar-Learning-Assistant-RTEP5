@@ -1,4 +1,4 @@
-#include "../src/compute/guitarfft.cpp"
+#include "../src/compute/guitarfft.hpp"
 #include <cmath>
 #include <vector>
 #include <array>
