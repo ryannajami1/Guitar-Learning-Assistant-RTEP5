@@ -10,7 +10,7 @@
 #include <memory>
 #include <thread>
 #include <array>
-#include "guitarfft.hpp"
+#include "guitarfft.cpp"
 #include "audio_input.hpp"
 
 auto main() -> int {
