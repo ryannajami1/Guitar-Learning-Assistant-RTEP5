@@ -6,6 +6,7 @@
 #include <vector>
 #include <functional>
 #include <cstdint>
+#include "biquad_bandstop.hpp"
 
 constexpr size_t sample_array_size = 128;
 
@@ -32,6 +33,8 @@ private:
 
     std::array<int16_t, sample_array_size> sample_array;
     std::vector<int16_t> recording_buffer;
+
+    BiquadBandstop bandstop_filter; // notch filter to remove 50 Hz
 
     bool done = false;
     bool recording = false;
