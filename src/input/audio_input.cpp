@@ -5,8 +5,7 @@
  * ALSA is configured to send 128 16-bit mono samples per period at a sameple rate of 8kHz
  *
  * TO DO:
- * - Add filtering for input data to allow for downsampling
- * - Add HPF to remove 50 Hz noise (50Hz interference amplitude is larger than signal amplitude)
+ * - Add low-pass filtering for input data to allow for downsampling
  */
 
 #include "audio_input.hpp"
@@ -14,12 +13,14 @@
 // use the newer ALSA API
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
+#include "Fir1.h"
 #include <array>
 #include <vector>
 #include <functional>
 #include <iostream>
 #include <cstdint>
 #include <thread>
+#include "biquad_bandstop.hpp"
 
 /* Init 
  *
@@ -99,6 +100,8 @@ void AudioInput::init()
        exit(1);
     }
 
+    // configure the biquad filter for 50 Hz rejection
+    bandstop_filter.config(50, 8000, 50);
 }
 
 
@@ -131,7 +134,13 @@ void AudioInput::start_loop()
         // copy the buffer into C++ array object
         std::copy(buffer, buffer+size, sample_array.begin());
 
-        // iterate over the array to check the amplitude of each sample
+        // iterate over the received sample buffer and filter
+        for (uint8_t i=0; i<sample_array_size; i++)
+        {
+            sample_array[i] = bandstop_filter.process(sample_array[i]);
+        }
+
+        // iterate over the filtered array to check the amplitude of each sample
         for (uint8_t i=0; i<sample_array_size; i++)
         {
             if (sample_array[i] >= saturation_threshold)
@@ -166,11 +175,12 @@ void AudioInput::record_period(std::array<int16_t, sample_array_size>& sample_ar
     if (periods_recorded == num_periods)
     {
         // send the full buffer to the fft callback function in a new thread
-        std::thread thr(callback_function, recording_buffer);
+        // std::thread thr(callback_function, recording_buffer);
+        callback_function(recording_buffer);
 
         // allow the thread to run with the signal processing
         // loop will return to the blocking ALSA read
-        thr.detach();
+        // thr.detach();
 
         // clear the buffer ready for the next chord
         recording = false;
