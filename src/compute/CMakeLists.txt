@@ -13,6 +13,6 @@ find_package(ALSA REQUIRED)
 
 add_executable(guitarfft guitarfft.cpp)
 
-target_include_directories(guitarfft PRIVATE ../input)
-target_link_libraries(guitarfft audio_input asound ${FFTW_LIB} -lm)
+target_include_directories(guitarfft PRIVATE ../input ../chord-detection)
+target_link_libraries(guitarfft audio_input asound ${FFTW_LIB} chord_detection -lm)
 

@@ -16,6 +16,7 @@ cmake_args="-G 'Unix Makefiles' -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 # Check for --debug argument
 if [ "$1" = "--debug" ]; then
     cmake_args="$cmake_args -DCMAKE_BUILD_TYPE=Debug"
+    echo "Making debug build"
     shift
 fi
 

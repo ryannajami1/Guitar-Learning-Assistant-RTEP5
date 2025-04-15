@@ -11,6 +11,7 @@
 #include <thread>
 #include <array>
 #include "audio_input.hpp"
+#include "ChordDetection.hpp"
 
 #define FRAMES 128
 
@@ -188,6 +189,53 @@ public:
             process_frames();
 
             // Finlay
+            // Get the Chord
+            ChordDetection cd;
+            std::vector<int> notes;
+
+            // convert to magnitudes and calc frequencies
+            std::vector<float> fft_mags;
+	    std::vector<float> fft_freqs;
+
+            for (unsigned int i = 2; i < fft_size / 2 - 2; i++) {
+                float real = output_buffer[i][0];
+                float imag = output_buffer[i][1];
+                float magnitude = sqrt(real * real + imag * imag);
+                fft_mags.push_back(magnitude);
+
+		float frequency = static_cast<float>(i) * sample_rate / fft_size;
+		fft_freqs.push_back(frequency);
+            }
+
+	    // Find the peaks
+	    // Calculate the noise floor
+	    float noise_floor = cd.CalculateNoiseFloor(fft_mags);
+	    float threshold = noise_floor * 50;
+
+	    // Run peak detection function
+	    std::vector<int> peak_indexes = cd.determine_peaks(fft_mags, threshold, 0.1, 0);
+
+	    // Get frequencies of peaks
+	    std::vector<float> peak_frequencies;
+	    for (int peak_index : peak_indexes) {
+		peak_frequencies.push_back(fft_freqs[peak_index]);
+	    }
+
+	    // Get the note numbers from the peak freqeuncies
+            for (float freq : peak_frequencies) {
+                notes.push_back(cd.NoteNumber(freq));
+            }
+
+	    // Print the frequencies and notes
+	    std::cout << "Freqs and Notes\n";
+	    for (unsigned int i = 0; i < peak_frequencies.size(); i++) {
+		std::cout << "Freq: " << peak_frequencies[i] << " | Note: " << cd.NoteName(notes[i]) << std::endl;
+	    }
+
+            string chord_name = cd.ChordLookup(notes);
+
+            std::cout << chord_name << std::endl;
+
             
             // Reset frame counter but keep the buffer position
             // (this creates a sliding window effect)
@@ -214,6 +262,7 @@ public:
         // Find frequency peaks
         find_frequency_peaks();
         print_frequency_peaks();
+
     }
     
     // Get frequency peaks for chord detection

@@ -140,6 +140,11 @@ map<vector<int>, string> triad_chord_table = {
 
 // string ChordDetection::ChordLookup(vector<int> notes, int root) {
 string ChordDetection::ChordLookup(vector<int> notes) {
+    // Check if there are any notes
+    if (notes.size() == 0) {
+	return "";
+    }
+
     // Find the root note
     int root = notes[0] % 12;
     if (root < 0) root += 12;
