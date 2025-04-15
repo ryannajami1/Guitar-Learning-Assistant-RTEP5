@@ -13,20 +13,20 @@
 #include "guitarfft.cpp"
 #include "audio_input.hpp"
 
-int main() {
+auto main() -> int {
     // Create processor for Sampled frames at 2kHz
     // Will collect frames (total 1024 samples) before processing
     GuitarFFTProcessor processor(FRAMES, 2000, FRAMES);
     AudioInput in;
     
     // Initialize the processor
-    if (!processor.initialize()) {
+    if (!processor.Initialize()) {
         std::cerr << "Failed to initialize FFT processor" << std::endl;
         return 1;
     }
     
     in.register_callback([&processor](auto frame) {
-        processor.add_frame(frame);
+        processor.AddFrame(frame);
     });
 
     in.init();
