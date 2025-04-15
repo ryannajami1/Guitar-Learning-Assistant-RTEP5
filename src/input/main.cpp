@@ -9,25 +9,18 @@
 
 AudioInput in;
 
-int frame_counter = 0;
-int max_frames = 4000; // approx 0.5s worth of frames
-
-void callback(std::array<int16_t, sample_array_size>& sample_array)
+void callback(std::vector<int16_t>& sample_buffer)
 {
-    frame_counter += 32;
+    std::cerr << "Chord detected" << std::endl;
 
-    for (uint8_t i=0; i<sample_array_size; i++)
-    {
-        std::cout << sample_array[i] << std::endl; 
-    }
-
-    if (frame_counter >= max_frames)
-    {
-        in.stop_loop();
+    for (const auto& val : sample_buffer) {
+        std::cout << val << std::endl;
     }
 }
 
 int main() {    
+    std::cerr << "Chord test" <<std::endl;
+
     in.register_callback(callback);
     in.init();
     in.start_loop();

@@ -1,6 +1,6 @@
 # src/input/CMakeLists.txt
 
-add_library(audio_input audio_input.cpp)
+add_library(audio_input audio_input.cpp biquad_bandstop.cpp)
 
 target_include_directories(audio_input PUBLIC .)
 

@@ -3,28 +3,26 @@
 
 #include <alsa/asoundlib.h>
 #include <array>
+#include <vector>
 #include <functional>
 #include <cstdint>
+#include "biquad_bandstop.hpp"
 
 constexpr size_t sample_array_size = 128;
-typedef std::function<void(std::array<uint16_t, sample_array_size>)> cb_t;
 
 class AudioInput{
 public:
-    // AudioInput();
-    // ~AudioInput();
-
     void init();
     void start_loop();
     void stop_loop();
     void close();
+    void record_period(std::array<int16_t, sample_array_size>& sample_array);
 
-    void input_loop();
-    void register_callback(std::function<void(std::array<int16_t, sample_array_size>&)> new_callback);
+    void register_callback(std::function<void(std::vector<int16_t>&)> new_callback);
 
 private:
     // callback function to be called when data is received
-    std::function<void(std::array<int16_t, sample_array_size>&)> callback_function;
+    std::function<void(std::vector<int16_t>&)> callback_function;
 
     snd_pcm_t* handle; // pointer to audio stream handle
     snd_pcm_hw_params_t* params; // pointer to audio stream parameters
@@ -34,8 +32,17 @@ private:
     int16_t* buffer; // buffer to store single frame
 
     std::array<int16_t, sample_array_size> sample_array;
+    std::vector<int16_t> recording_buffer;
+
+    BiquadBandstop bandstop_filter; // notch filter to remove 50 Hz
 
     bool done = false;
+    bool recording = false;
+    int periods_recorded = 0;
+    int num_periods = 64; // number of periods to record in a buffer
+
+    const int saturation_threshold = 32767;
+    const int chord_threshold = 800;
 };
 
 #endif
