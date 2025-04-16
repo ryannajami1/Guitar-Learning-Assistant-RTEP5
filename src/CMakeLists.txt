@@ -11,4 +11,4 @@ find_package(ALSA REQUIRED)
 
 add_executable(main main.cpp)
 target_include_directories(main PRIVATE chord-detection compute input)
-target_link_libraries(main audio_input asound ${FFTW_LIB} chord_detection -lm)
+target_link_libraries(main guitarfft audio_input asound ${FFTW_LIB} chord_detection -lm)
