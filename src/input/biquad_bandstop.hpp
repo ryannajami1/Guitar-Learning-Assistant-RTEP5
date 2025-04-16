@@ -11,7 +11,7 @@ public:
     int16_t process(int16_t in);
 
 private:
-    double a0, a1, a2, b1, b2;
+    double b0, b1, b2, a1, a2;
     double z1 = 0, z2 = 0;
 };
 
