@@ -1,4 +1,5 @@
 # src/CMakeLists.txt
+set(libwebsockets_lib "/usr/lib/aarch64-linux-gnu/libwebsockets.so.17")
 
 add_subdirectory(input)
 add_subdirectory(compute)
