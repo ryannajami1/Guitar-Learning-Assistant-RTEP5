@@ -8,7 +8,5 @@ else()
     message(FATAL_ERROR "libwebsockets not found!")
 endif()
 
-# Create an executable
-add_executable(websocket websocket.cpp)
-
-target_link_libraries(websocket ${libwebsockets_lib})
+# Create a library
+add_library(websocket websocket.cpp ${libwebsockets_lib})

@@ -16,7 +16,6 @@ extern const struct lws_protocols kProtocols[];
 int CallbackWs(struct lws *wsi, enum lws_callback_reasons reason,
                void *user, void *incomingMsg, size_t len);
 
-void SendFunction(int num);
-void SignalHandler(int sig);
+void LWS_SendMessage(const std::string& message);
 
 #endif  // WEBSOCKET_HPP
