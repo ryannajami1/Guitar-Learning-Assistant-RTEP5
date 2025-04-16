@@ -28,38 +28,38 @@ using namespace std;
 
 // 
 map<vector<int>, string> chord_interval_table = {
-    // Major
+    // maj
     // Notes:       1-3-5-8
     // Intervals:    4,3,5
-    {{4,3,5}, "Major"},
-    {{5,4,3}, "Major 1stInv"},
-    {{3,5,4}, "Major 2ndInv"},
-    {{4,3,5}, "Major"},
-    {{2,2,3,5}, "Major"},
-    // Minor
+    {{4,3,5}, "maj"},
+    {{5,4,3}, "maj 1stInv"},
+    {{3,5,4}, "maj 2ndInv"},
+    {{4,3,5}, "maj"},
+    {{2,2,3,5}, "maj"},
+    // min
     // Notes:       1-m3-5-8
     // Intervals:    3,4,5
-    {{3,4,5}, "Minor"},
-    {{5,3,4}, "Minor 1stInv"},
-    {{4,5,3}, "Minor 2ndInv"},
-    {{2,1,4,5}, "Minor"},
-    //{{2,1,4,3,2} "Minor"},
+    {{3,4,5}, "min"},
+    {{5,3,4}, "min 1stInv"},
+    {{4,5,3}, "min 2ndInv"},
+    {{2,1,4,5}, "min"},
+    //{{2,1,4,3,2} "min"},
     // Diminished
     // Notes:       1-m3-m5-8
     // Intervals:    3,3,6
-    {{3,3,6}, "Diminished"},
+    {{3,3,6}, "dim"},
     // Augmented
     // Notes:       1-3-#5(m6)-8
     // Intervals:    4,4,4
-    {{4,4,4}, "Augmented"},
+    {{4,4,4}, "aug"},
     // Sus2
     // Notes:       1-2-5-8
     // Intervals:    2,5,5
-    {{2,5,5}, "Sus2"},
+    {{2,5,5}, "sus2"},
     // Sus4
     // Notes:       1-4-5-8
     // Intervals:    5,2,5
-    {{5,2,5}, "Sus4"},
+    {{5,2,5}, "sus4"},
     // Dominant 7
     // Notes:       1-3-5-m7-8
     // Intervals:    4,3,3,2
@@ -67,25 +67,25 @@ map<vector<int>, string> chord_interval_table = {
     {{2,2,1,2,3,2}, "7"},
     {{2,2,1,2,3,1,1}, "7"},
     {{4,1,2,3,2}, "7"},
-    // Major 7
+    // maj 7
     // Notes:       1-3-5-7-8
     // Intervals:    4,3,4,1
-    {{4,3,4,1}, "Major 7"},
-    {{4,2,1,4,1}, "Major 7"},
-    {{2,2,2,1,4,1}, "Major 7"},
-    // Minor 7
+    {{4,3,4,1}, "maj7"},
+    {{4,2,1,4,1}, "maj7"},
+    {{2,2,2,1,4,1}, "maj7"},
+    // min 7
     // Notes:       1-m3-5-m7-8
     // Intervals:    3, 4,3, 2
-    {{3,4,3,2}, "Minor 7"},
-    {{2,1,2,2,3,2}, "Minor 7"},
-    // Major 6
+    {{3,4,3,2}, "min7"},
+    {{2,1,2,2,3,2}, "min7"},
+    // maj 6
     // Notes:       1-3-5-6-8
     // Intervals:    4,3,2,3
-    {{4,3,2,3}, "Major 6"},
-    // Minor 6
+    {{4,3,2,3}, "maj6"},
+    // min 6
     // Notes:       1-m3-5-m6-8
     // Intervals:    3, 4,1, 4
-    {{3,4,1,4}, "Minor 6"}
+    {{3,4,1,4}, "min6"}
 
 };
 
@@ -324,18 +324,18 @@ auto ChordDetection::ChordLookup(const vector<float> &frequencies) -> string {
   }
 
   // Check for inversions and change root note
-  if (chord_type == "Major 1stInv") {
+  if (chord_type == "maj 1stInv") {
     root += 5;
-    chord_type = "Major";
-  } else if (chord_type == "Minor 1stInv") {
+    chord_type = "maj";
+  } else if (chord_type == "min 1stInv") {
     root += 5;
-    chord_type = "Minor";
-  } else if (chord_type == "Major 2ndInv") {
+    chord_type = "min";
+  } else if (chord_type == "maj 2ndInv") {
     root += 8;
-    chord_type = "Major";
-  } else if (chord_type == "Minor 2ndInv") {
+    chord_type = "maj";
+  } else if (chord_type == "min 2ndInv") {
     root += 9;
-    chord_type = "Minor";
+    chord_type = "min";
   }
   if (root >= 12) {
     root %= 12;
