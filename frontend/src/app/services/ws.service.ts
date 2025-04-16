@@ -6,7 +6,7 @@ import {Observable, Subject} from 'rxjs';
 })
 export class WsService {
 
-  SOCKET_URL: string = "ws://192.168.52.229:9000" ;// MOVE THIS TO ENVIRONMENT
+  SOCKET_URL: string = "ws://192.168.1.74:9000" ; // TODO:  MOVE THIS TO ENVIRONMENT
   private websocket: WebSocket;
   private messages: Subject<any> = new Subject();
 
@@ -17,6 +17,11 @@ export class WsService {
 
   connect() {
     console.log("CONNECT")
+
+    this.websocket.onopen = (event) => {
+      console.log('WebSocket connection established!');
+    }
+
     this.websocket.onmessage = (event) => {
       this.messages.next(JSON.parse(event.data));
     };
