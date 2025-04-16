@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <cstring>
 #include <unistd.h>
-#include <string>
 
 int interrupted = 0;
 struct lws_context *context = nullptr;
