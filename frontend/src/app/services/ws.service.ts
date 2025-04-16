@@ -23,7 +23,9 @@ export class WsService {
     }
 
     this.websocket.onmessage = (event) => {
-      this.messages.next(JSON.parse(event.data));
+      console.log(event);
+      console.log(event.data);
+      this.messages.next(event.data);
     };
 
     this.websocket.onerror = (error) => {
