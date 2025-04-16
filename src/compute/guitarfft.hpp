@@ -45,7 +45,7 @@ public:
 
     auto Initialize() -> bool;
     void AddFrame(std::array<int16_t, FRAMES> &frame);
-    void ProcessFrames();
+    void ProcessFrames(std::vector<int16_t> buf);
     [[nodiscard]] auto GetFrequencyPeaks() const -> std::vector<std::pair<float, float>>;
     void WriteFrequencyDataToFile(const std::string &filename);
     void PrintFrequencyPeaks();

@@ -160,7 +160,7 @@ void GuitarFFTProcessor::AddFrame(std::array<int16_t, FRAMES> &frame) {
     // If we have enough frames, process them
     if (frames_collected_ >= frames_to_collect_) {
         // Process the collected frames
-        ProcessFrames();
+        // ProcessFrames();
 
         // Reset frame counter but keep the buffer position
         // (this creates a sliding window effect)
@@ -169,7 +169,8 @@ void GuitarFFTProcessor::AddFrame(std::array<int16_t, FRAMES> &frame) {
 }
 
 // Process the collected frames
-void GuitarFFTProcessor::ProcessFrames() {
+void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
+    frame_buffer_ = buf;
     // Copy data to FFTW input buffer with conversion to float and windowing
     for (unsigned int i = 0; i < fft_size_; i++) {
         // Apply circular buffer logic to get the right sample
@@ -193,13 +194,13 @@ void GuitarFFTProcessor::ProcessFrames() {
 	std::vector<float> fft_mags;
 	std::vector<float> fft_freqs;
 
-	for (unsigned int i = 2; i < fft_size / 2 - 2; i++) {
-        float real = output_buffer[i][0];
-        float imag = output_buffer[i][1];
+	for (unsigned int i = 2; i < fft_size_ / 2 - 2; i++) {
+        float real = output_buffer_[i][0];
+        float imag = output_buffer_[i][1];
         float magnitude = sqrt(real * real + imag * imag);
         fft_mags.push_back(magnitude);
 
-		float frequency = static_cast<float>(i) * sample_rate / fft_size;
+		float frequency = static_cast<float>(i) * sample_rate_ / fft_size_;
 		fft_freqs.push_back(frequency);
 	}
 
@@ -307,13 +308,13 @@ int main() {
     AudioInput in;
     
     // Initialize the processor
-    if (!processor.initialize()) {
+    if (!processor.Initialize()) {
         std::cerr << "Failed to initialize FFT processor" << std::endl;
         return 1;
     }
     
     in.register_callback([&processor](auto frame) {
-        processor.process_frames(frame);
+        processor.ProcessFrames(frame);
     });
 
     in.init();
