@@ -46,8 +46,8 @@ export class ChordsService {
   handleWsMessage(message: any): void {
     this.wsChordReceived = true;
     console.log(this.currentChordToBePlayed);
-    console.log(message["chord"]); // TODO: CHANGE TO JSON OBJECT
-    this.wsLastChordReceived = message["chord"];
+    console.log(message); // TODO: CHANGE TO JSON OBJECT
+    this.wsLastChordReceived = message;
     if (this.wsLastChordReceived == this.currentChordToBePlayed) {
       this.chordEventHandler(EChordStatus.Correct)
     }

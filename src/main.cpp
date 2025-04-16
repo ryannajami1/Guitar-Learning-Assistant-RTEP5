@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <libwebsockets.h>
 #include "guitarfft.hpp"
 #include "audio_input.hpp"
 #include "ChordDetection.hpp"
