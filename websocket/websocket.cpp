@@ -1,25 +1,21 @@
+#include "websocket.hpp"
+
 #include <csignal>
 #include <cstdio>
 #include <cstring>
-#include <ctime>
-#include <libwebsockets.h>
 #include <unistd.h>
-#include <array>
 
-static int interrupted = 0;
-static struct lws_context *context;
-static struct lws *global_wsi = nullptr;
+int interrupted = 0;
+struct lws_context *context = nullptr;
+struct lws *global_wsi = nullptr;
+int counter = 0;
 
-#define MAX_PAYLOAD_SIZE 128
-
-static int counter = 0;
-
-static auto CallbackWs(struct lws *wsi, enum lws_callback_reasons reason,
-                       void * /*user*/, void *incomingMsg, size_t /*len*/) -> int {
+auto CallbackWs(struct lws *wsi, enum lws_callback_reasons reason,
+               void * /*user*/, void *incomingMsg, size_t /*len*/) -> int {
   switch (reason) {
   case LWS_CALLBACK_ESTABLISHED:
     global_wsi = wsi;
-    counter = 0; // Reset counter on new connection
+    counter = 0;
     lwsl_user("Client connected\n");
     break;
 
@@ -45,26 +41,30 @@ void SendFunction(int num) {
   }
 
   std::array<char, MAX_PAYLOAD_SIZE> msg;
-  snprintf(msg.data(), msg.size(), "%d", num);  // FIXED
+  snprintf(msg.data(), msg.size(), "%d", num);
 
   std::array<unsigned char, LWS_PRE + MAX_PAYLOAD_SIZE + 1> buffer;
-  size_t len = strlen(msg.data());              // FIXED
-  strcpy(reinterpret_cast<char *>(&buffer[LWS_PRE]), msg.data());  // FIXED
+  size_t len = strlen(msg.data());
+  strcpy(reinterpret_cast<char *>(&buffer[LWS_PRE]), msg.data());
 
   lws_write(global_wsi, &buffer[LWS_PRE], len, LWS_WRITE_TEXT);
   lws_callback_on_writable(global_wsi);
 }
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-static const struct lws_protocols kProtocols[] = {{
-                                                      "ws-protocol",
-                                                      CallbackWs,
-                                                      0,
-                                                      MAX_PAYLOAD_SIZE,
-                                                  },
-                                                  {nullptr, nullptr, 0, 0}};
+const struct lws_protocols kProtocols[] = {
+    {
+        "ws-protocol",
+        CallbackWs,
+        0,
+        MAX_PAYLOAD_SIZE,
+    },
+    {nullptr, nullptr, 0, 0}
+};
 
-void SignalHandler(int /*sig*/) { interrupted = 1; }
+void SignalHandler(int /*sig*/) {
+  interrupted = 1;
+}
 
 auto main() -> int {
   struct lws_context_creation_info info;
