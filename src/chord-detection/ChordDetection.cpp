@@ -13,111 +13,21 @@
 
 using namespace std;
 
-auto ChordDetection::DeterminePeaks(const vector<float> &data, float threshold,
-                                    float min_height, float /*min_width*/)
-    -> vector<int> {
+/* Terms used
+* ===========
+* Note Name:   Letter of note plus accident
+* Note Number: Distance of note from A4 (440Hz) in half steps
+* Note Index:  Note number ignoring the octaves. 0 is A and 11 is G#
+*/
 
-  float mask_top = data[0];
-  float mask_bottom = mask_top - min_height;
-
-  float highest = data[0];
-  int highest_index = 0;
-  float lowest = data[0];
-
-  vector<int> peak_indices;
-
-  ChordDetection::State state = kUnknown;
-
-  for (size_t i = 0; i < data.size(); i++) {
-    // move mask
-    if (data[i] > mask_top) {
-      mask_top = data[i];
-      mask_bottom = mask_top - min_height;
-      highest = data[i];
-      highest_index = i;
-    } else if (data[i] < mask_bottom) {
-      mask_bottom = data[i];
-      mask_top = mask_bottom + min_height;
-      lowest = data[i];
-    }
-
-    // Check if mask has shifted away from peak or trough
-    if (highest > mask_top) {
-      if (state == kUnknown || state == kFindPeak) {
-        state = kFindTrough;
-        if (highest > threshold) {
-          peak_indices.push_back(highest_index);
-        }
-        lowest = mask_bottom;
-      }
-    }
-
-    if (lowest < mask_bottom) {
-      if (state == kUnknown || state == kFindTrough) {
-        state = kFindPeak;
-        highest = mask_top;
-        highest_index = i;
-      }
-    }
-  }
-
-  return peak_indices;
-}
-
-auto ChordDetection::CalculateNoiseFloor(const vector<float> &data) -> float {
-  float sum = 0.0;
-  for (float value : data) {
-    sum += value;
-  }
-  return sum / data.size();
-}
-
-auto ChordDetection::GetPeakFrequencies(vector<float> frequencies,
-                                        const vector<float> &magnitudes)
-    -> vector<float> {
-  // Calculate the noise floor to adjust the threshold
-  float noise_floor = CalculateNoiseFloor(magnitudes);
-  float threshold = noise_floor * 30;
-
-  // Run peak detection function
-  std::vector<int> peak_indexes = DeterminePeaks(magnitudes, threshold, 0.5, 1);
-
-  // Get frequencies of peaks
-  std::vector<float> peak_frequencies;
-  for (int peak_index : peak_indexes) {
-    // Make sure freq is within bounds
-    float freq = frequencies[peak_index];
-    if (freq > 15) {
-      peak_frequencies.push_back(frequencies[peak_index]);
-    }
-  }
-
-  return peak_frequencies;
-}
-
-auto ChordDetection::NoteName(int note_num) -> string {
-  vector<string> notes = {"A",  "A#", "B", "C",  "C#", "D",
-                          "D#", "E",  "F", "F#", "G",  "G#"};
-
-  int note_index = note_num % 12;
-
-  if (note_index < 0) {
-    note_index += 12;
-  }
-  return notes[note_index];
-}
-
-auto ChordDetection::NoteNumber(float frequency) -> int {
-  int note_number = static_cast<int>(round(12 * log2(frequency / 440.0)));
-  return note_number;
-}
-
-/* Chord Reference
+/* Interval Reference
+ * ==================
  * Note:    1, m2, M2, m3, M3,  4, a4,  5, m6, M6, m7, M7,  8
  * Steps:   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12
 */
 
-map<vector<int>, string> triad_chord_table = {
+// 
+map<vector<int>, string> chord_interval_table = {
     // Major
     // Notes:       1-3-5-8
     // Intervals:    4,3,5
@@ -179,6 +89,111 @@ map<vector<int>, string> triad_chord_table = {
 
 };
 
+// Peak detection algorithm
+auto DeterminePeaks(const vector<float> &data, float threshold,
+                                    float min_height, float /*min_width*/)
+    -> vector<int> {
+
+  float mask_top = data[0];
+  float mask_bottom = mask_top - min_height;
+
+  float highest = data[0];
+  int highest_index = 0;
+  float lowest = data[0];
+
+  vector<int> peak_indices;
+
+  ChordDetection::State state = ChordDetection::kUnknown;
+
+  for (size_t i = 0; i < data.size(); i++) {
+    // move mask
+    if (data[i] > mask_top) {
+      mask_top = data[i];
+      mask_bottom = mask_top - min_height;
+      highest = data[i];
+      highest_index = i;
+    } else if (data[i] < mask_bottom) {
+      mask_bottom = data[i];
+      mask_top = mask_bottom + min_height;
+      lowest = data[i];
+    }
+
+    // Check if mask has shifted away from peak or trough
+    if (highest > mask_top) {
+      if (state == ChordDetection::kUnknown || state == ChordDetection::kFindPeak) {
+        state = ChordDetection::kFindTrough;
+        if (highest > threshold) {
+          peak_indices.push_back(highest_index);
+        }
+        lowest = mask_bottom;
+      }
+    }
+
+    if (lowest < mask_bottom) {
+      if (state == ChordDetection::kUnknown || state == ChordDetection::kFindTrough) {
+        state = ChordDetection::kFindPeak;
+        highest = mask_top;
+        highest_index = i;
+      }
+    }
+  }
+
+  return peak_indices;
+}
+
+// Calculates the average value in a vector of floats
+auto CalculateNoiseFloor(const vector<float> &data) -> float {
+  float sum = 0.0;
+  for (float value : data) {
+    sum += value;
+  }
+  return sum / data.size();
+}
+
+// Gets the peak frequencies from fft data
+auto ChordDetection::GetPeakFrequencies(vector<float> frequencies,
+                                        const vector<float> &magnitudes)
+    -> vector<float> {
+  // Calculate the noise floor to adjust the threshold
+  float noise_floor = CalculateNoiseFloor(magnitudes);
+  float threshold = noise_floor * 30;
+
+  // Run peak detection function
+  std::vector<int> peak_indexes = DeterminePeaks(magnitudes, threshold, 0.5, 1);
+
+  // Get frequencies of peaks
+  std::vector<float> peak_frequencies;
+  for (int peak_index : peak_indexes) {
+    // Make sure freq is within bounds
+    float freq = frequencies[peak_index];
+    if (freq > 15) {
+      peak_frequencies.push_back(frequencies[peak_index]);
+    }
+  }
+
+  return peak_frequencies;
+}
+
+// Converts note number to note name
+auto NoteName(int note_num) -> string {
+  vector<string> notes = {"A",  "A#", "B", "C",  "C#", "D",
+                          "D#", "E",  "F", "F#", "G",  "G#"};
+
+  int note_index = note_num % 12;
+
+  if (note_index < 0) {
+    note_index += 12;
+  }
+  return notes[note_index];
+}
+
+// Converts frequency to note number
+auto NoteNumber(float frequency) -> int {
+  int note_number = static_cast<int>(round(12 * log2(frequency / 440.0)));
+  return note_number;
+}
+
+// Gets the chord type from a given set of notes
 auto NotesSetToChordType(vector<int> notes_set) -> string {
   // Print notes_set for debugging
   cout << "Notes set: ";
@@ -205,9 +220,10 @@ auto NotesSetToChordType(vector<int> notes_set) -> string {
   cout << endl;
 
   // match the chord type
-  return triad_chord_table[intervals];
+  return chord_interval_table[intervals];
 }
 
+// Remove any items in a list tha only appear once
 auto RemoveNonDuplicates(const vector<int> &vec) -> vector<int> {
   unordered_map<int, int> num_occurences;
 
@@ -225,8 +241,20 @@ auto RemoveNonDuplicates(const vector<int> &vec) -> vector<int> {
   return new_vector;
 }
 
-// string ChordDetection::ChordLookup(vector<int> notes, int root) {
+/* Get the chord name from a vector of frequencies
+ * 
+ * This chord matching algorithm tries to match chords with the following methods. If one method fails it 
+ * tries the next one.
+ *   1. Assume lowest note is the root note and use all frequenices.
+ *   2. Remove the lowest note incase it was a rouge harmonic and try again.
+ *   3. Remove any notes that only appeared once (ie in one octave) as these are more likely to be harmonics.
+ */
 auto ChordDetection::ChordLookup(const vector<float> &frequencies) -> string {
+
+  // Make sure frequencies isn't empty
+  if (frequencies.empty()) {
+    return "";
+  }
 
   // Get the note numbers from the peak freqeuncies
   std::vector<int> notes;
@@ -235,12 +263,7 @@ auto ChordDetection::ChordLookup(const vector<float> &frequencies) -> string {
     notes.push_back(NoteNumber(freq));
   }
 
-  // Check if there are any notes
-  if (notes.empty()) {
-    return "";
-  }
-
-  // Remove duplicates where the same freq has had 2 very close peaks
+  // Remove duplicates where a note was detected in the same octave twice
   notes.erase(unique(notes.begin(), notes.end()), notes.end());
   std::cout << "-----------------\nNotes going into algo\n------------------\n";
   for (int note : notes) {
@@ -273,6 +296,7 @@ auto ChordDetection::ChordLookup(const vector<float> &frequencies) -> string {
   rotate(notes_set.begin(), root_it, notes_set.end());
 
   string chord_type = NotesSetToChordType(notes_set);
+
   // If couldn't find chord, remove root and try again
   if (chord_type.empty()) {
     std::cout << "Tryng next note as root\n";
@@ -317,7 +341,7 @@ auto ChordDetection::ChordLookup(const vector<float> &frequencies) -> string {
     root %= 12;
   }
 
-  string root_note = ChordDetection::NoteName(root);
+  string root_note = NoteName(root);
   string chord_name = root_note + " " + chord_type;
   return chord_name;
 }
