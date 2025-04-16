@@ -16,3 +16,9 @@ add_executable(guitarfft guitarfft.cpp)
 target_include_directories(guitarfft PRIVATE ../input ../chord-detection)
 target_link_libraries(guitarfft audio_input asound ${FFTW_LIB} chord_detection -lm)
 
+add_library(guitarfft guitarfft.cpp)
+
+add_executable(mainfft mainfft.cpp)
+
+target_link_libraries(mainfft guitarfft audio_input asound pthread ${FFTW_LIB} -lm)
+

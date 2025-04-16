@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 # Store the original working directory
 original_dir=$(pwd)
