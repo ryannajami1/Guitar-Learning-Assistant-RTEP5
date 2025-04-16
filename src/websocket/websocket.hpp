@@ -3,6 +3,7 @@
 
 #include <libwebsockets.h>
 #include <array>
+#include <string>
 
 constexpr int MAX_PAYLOAD_SIZE = 128;
 
