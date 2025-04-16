@@ -6,28 +6,26 @@ void BiquadBandstop::config(double f_0, double f_s, double Q_factor)
     double alpha = sin(omega) / (2.0 * Q_factor);
     double cos_omega = cos(omega);
 
-    double a0 = 1.0 + alpha;
+    a0 = 1.0;
     a1 = -2.0 * cos_omega;
-    a2 = 1.0 - alpha;
-    b0 = 1.0;
+    a2 = 1.0;
     b1 = -2.0 * cos_omega;
-    b2 = 1.0;
-    
-    // normalise by a0
-    b0 /= a0;
-    b1 /= a0;
-    b2 /= a0;
-    a1 /= a0;
-    a2 /= a0;
+    b2 = 1.0 - alpha;
+
+    double a0_norm = 1.0 + alpha;
+
+    // Normalize
+    a1 /= a0_norm;
+    a2 /= a0_norm;
+    b1 /= a0_norm;
+    b2 /= a0_norm;
 }
 auto BiquadBandstop::process(int16_t new_input) -> int16_t {
     // Convert input to float
     double in = static_cast<double>(input);
-
-    // filter processing
-    double out = b0 * in + z1;
-    z1 = b1 * in + z2 - a1 * out;
-    z2 = b2 * in - a2 * out;
+    double out = a0 * in + z1;
+    z1 = a1 * in + z2 - b1 * out;
+    z2 = a2 * in - b2 * out;
 
 
   // Clip result to int16_t range

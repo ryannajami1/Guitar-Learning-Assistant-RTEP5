@@ -101,7 +101,6 @@ void AudioInput::init()
     }
 
     // configure the biquad filter for 50 Hz rejection
-    // Q of 50 gives bandwidth of 1 Hz
     bandstop_filter.config(50, 8000, 50);
 }
 

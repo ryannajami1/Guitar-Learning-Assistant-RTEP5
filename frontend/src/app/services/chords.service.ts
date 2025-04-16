@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {EChordStatus} from '../models/chord-status.enum';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {ChordGenerationSettings, defaultChordGenerationSettings} from '../models/chord-generation-settings.model';
+import {WsService} from './ws.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,16 +10,21 @@ import {ChordGenerationSettings, defaultChordGenerationSettings} from '../models
 export class ChordsService {
 
 
-  constructor() {
+  constructor(private wsService: WsService) {
     let chordGenerationSettings = sessionStorage.getItem('chordGenerationSettings');
     if (chordGenerationSettings) {
       this.chordGenerationSettings = JSON.parse(chordGenerationSettings);
     }
+
+    this.wsService.getMessages().subscribe((event) => {
+      this.handleWsMessage(event);
+    })
   }
 
   timerStartValueMs: number = 5000; // in ms
   timerCurrentValueMs: number = 0; // in ms
   timerInterval: any;
+
 
   private _timerRunning = new BehaviorSubject<boolean>(false);
   timerRunning$: Observable<boolean> = this._timerRunning.asObservable();
@@ -33,6 +39,19 @@ export class ChordsService {
   showCorrectChordModal: boolean = false;
   showWrongChordModal: boolean = false;
   showTimeoutModal: boolean = false;
+
+  wsChordReceived: boolean = false;
+  wsLastChordReceived: string = '';
+
+  handleWsMessage(message: any): void {
+    this.wsChordReceived = true;
+    console.log(this.currentChordToBePlayed);
+    console.log(message); // TODO: CHANGE TO JSON OBJECT
+    this.wsLastChordReceived = message;
+    if (this.wsLastChordReceived == this.currentChordToBePlayed) {
+      this.chordEventHandler(EChordStatus.Correct)
+    }
+  }
 
   getAccuracy(): number {
 
@@ -95,6 +114,8 @@ export class ChordsService {
   }
 
   timerStart(): void {
+    this.wsChordReceived = false;
+    this.wsLastChordReceived = '';
     this._timerRunning.next(true);
     this.timerCurrentValueMs = this.timerStartValueMs;
 
@@ -102,7 +123,7 @@ export class ChordsService {
       if (this.timerCurrentValueMs <= 0) {
         this.timerCurrentValueMs = 0;
         clearInterval(this.timerInterval);
-        this.chordEventHandler(EChordStatus.Timeout)
+        this.wsChordReceived ? this.chordEventHandler(EChordStatus.Wrong) : this.chordEventHandler(EChordStatus.Timeout);
       } else {
         this.timerCurrentValueMs = this.timerCurrentValueMs - 50;
       }

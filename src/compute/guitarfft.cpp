@@ -1,14 +1,21 @@
-#include "guitarfft.hpp"
-#include <algorithm>
+#include "fftw3.h"
+#include <vector>
 #include <cmath>
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include "guitarfft.hpp"
 #include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <memory>
-#include <string>
 #include <thread>
+#include <array>
+#include "audio_input.hpp"
+#include "ChordDetection.hpp"
 #include <vector>
+#include "websocket.hpp"
 
 // Implementation of FrequencyPeak operator<
 auto GuitarFFTProcessor::FrequencyPeak::operator<(const FrequencyPeak &other) const -> bool {
@@ -136,33 +143,9 @@ auto GuitarFFTProcessor::Initialize() -> bool {
     return true;
 }
 
-// Add a frame to the buffer and process if we have enough frames
-void GuitarFFTProcessor::AddFrame(std::array<int16_t, FRAMES> &frame) {
-    // Copy the frame into buffer
-    std::memcpy(frame_buffer_.data() + buffer_position_, frame.begin(),
-                samples_per_frame_ * sizeof(int16_t));
-
-    // Update position and frame count
-    buffer_position_ += samples_per_frame_;
-    if (buffer_position_ >= frame_buffer_.size()) {
-        buffer_position_ = 0; // Wrap around if needed
-    }
-
-    frames_collected_++;
-
-    // If we have enough frames, process them
-    if (frames_collected_ >= frames_to_collect_) {
-        // Process the collected frames
-        ProcessFrames();
-
-        // Reset frame counter but keep the buffer position
-        // (this creates a sliding window effect)
-        frames_collected_ = frames_to_collect_ / 2; // 50% overlap
-    }
-}
-
 // Process the collected frames
-void GuitarFFTProcessor::ProcessFrames() {
+void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
+    frame_buffer_ = buf;
     // Copy data to FFTW input buffer with conversion to float and windowing
     for (unsigned int i = 0; i < fft_size_; i++) {
         // Apply circular buffer logic to get the right sample
@@ -176,6 +159,34 @@ void GuitarFFTProcessor::ProcessFrames() {
     // Find frequency peaks
     FindFrequencyPeaks();
     PrintFrequencyPeaks();
+
+    // Find the chord
+	ChordDetection cd;
+
+	// Convert fft data to vectors of magnitudes and frequencies
+	std::vector<float> fft_mags;
+	std::vector<float> fft_freqs;
+
+	for (unsigned int i = 2; i < fft_size_ / 2 - 2; i++) {
+        float real = output_buffer_[i][0];
+        float imag = output_buffer_[i][1];
+        float magnitude = sqrt(real * real + imag * imag);
+        fft_mags.push_back(magnitude);
+
+		float frequency = static_cast<float>(i) * sample_rate_ / fft_size_;
+		fft_freqs.push_back(frequency);
+	}
+
+	// Get the peak frequencies from the FFT data
+    std::vector<float> peak_frequencies = cd.GetPeakFrequencies(fft_freqs, fft_mags);
+
+    // Get the chord name from the peak frequencies
+	string chord_name = cd.ChordLookup(peak_frequencies);
+
+	std::cout << chord_name << std::endl;
+
+	// Send chord message over websocket
+	LWS_SendMessage(chord_name);
 }
 
 // Get frequency peaks for chord detection
@@ -238,14 +249,4 @@ void GuitarFFTProcessor::Cleanup() {
         fftwf_destroy_plan(fft_plan_);
         fft_plan_ = nullptr;
     }
-
-    if (input_buffer_ != nullptr) {
-        fftwf_free(input_buffer_);
-        input_buffer_ = nullptr;
-    }
-
-    if (output_buffer_ != nullptr) {
-        fftwf_free(output_buffer_);
-        output_buffer_ = nullptr;
-    }
-}
+};
