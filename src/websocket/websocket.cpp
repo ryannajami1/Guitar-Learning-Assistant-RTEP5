@@ -1,6 +1,5 @@
 #include "websocket.hpp"
 
-#include <csignal>
 #include <cstdio>
 #include <cstring>
 #include <unistd.h>
@@ -35,21 +34,20 @@ auto CallbackWs(struct lws *wsi, enum lws_callback_reasons reason,
   return 0;
 }
 
-void SendFunction(int num) {
+void LWS_SendMessage(const std::string& message) {
   if (global_wsi == nullptr) {
     return;
   }
 
-  std::array<char, MAX_PAYLOAD_SIZE> msg;
-  snprintf(msg.data(), msg.size(), "%d", num);
-
   std::array<unsigned char, LWS_PRE + MAX_PAYLOAD_SIZE + 1> buffer;
-  size_t len = strlen(msg.data());
-  strcpy(reinterpret_cast<char *>(&buffer[LWS_PRE]), msg.data());
+  size_t len = std::min(message.size(), static_cast<size_t>(MAX_PAYLOAD_SIZE));
+
+  memcpy(&buffer[LWS_PRE], message.c_str(), len);
 
   lws_write(global_wsi, &buffer[LWS_PRE], len, LWS_WRITE_TEXT);
   lws_callback_on_writable(global_wsi);
 }
+
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 const struct lws_protocols kProtocols[] = {
@@ -61,31 +59,3 @@ const struct lws_protocols kProtocols[] = {
     },
     {nullptr, nullptr, 0, 0}
 };
-
-void SignalHandler(int /*sig*/) {
-  interrupted = 1;
-}
-
-auto main() -> int {
-  struct lws_context_creation_info info;
-  memset(&info, 0, sizeof(info));
-  info.port = 9000;
-  info.protocols = kProtocols;
-  info.options = LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
-
-  context = lws_create_context(&info);
-  if (context == nullptr) {
-    lwsl_err("lws init failed\n");
-    return -1;
-  }
-
-  signal(SIGINT, SignalHandler);
-
-  while (interrupted == 0) {
-    lws_service(context, 100);
-    SendFunction(counter++);
-  }
-
-  lws_context_destroy(context);
-  return 0;
-}

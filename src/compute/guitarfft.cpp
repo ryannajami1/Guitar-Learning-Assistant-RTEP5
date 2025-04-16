@@ -15,6 +15,7 @@
 #include "audio_input.hpp"
 #include "ChordDetection.hpp"
 #include <vector>
+#include "websocket.hpp"
 
 // Implementation of FrequencyPeak operator<
 auto GuitarFFTProcessor::FrequencyPeak::operator<(const FrequencyPeak &other) const -> bool {
@@ -183,6 +184,9 @@ void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
 	string chord_name = cd.ChordLookup(notes);
 
 	std::cout << chord_name << std::endl;
+
+	// Send chord message over websocket
+	LWS_SendMessage(chord_name);
 }
 
 // Get frequency peaks for chord detection
