@@ -1,13 +1,15 @@
 # src/CMakeLists.txt
 
-add_library(mult5 mult5.cpp)
-
-target_include_directories(mult5 PUBLIC .)
-
-add_executable(helloworld helloworld.cpp)
-target_link_libraries(helloworld mult5)
-
-
 add_subdirectory(input)
 add_subdirectory(compute)
 add_subdirectory(chord-detection)
+
+find_library(FFTW_LIB fftw3f REQUIRED)
+include_directories(/usr/include)
+
+find_package(ALSA REQUIRED)
+
+add_executable(main main.cpp)
+target_include_directories(main PRIVATE chord-detection compute input)
+target_link_libraries(main audio_input asound ${FFTW_LIB} chord_detection -lm)
+target_link_libraries(guitarfft audio_input asound ${FFTW_LIB} chord_detection -lm)
