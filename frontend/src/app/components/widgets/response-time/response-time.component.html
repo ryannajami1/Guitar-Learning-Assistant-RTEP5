@@ -1,1 +1,3 @@
-<h3 style="text-align: center">153 ms</h3>
+<h3 style="text-align: center">
+  {{chordsService.getResponseTimeAvg() > 1000?  (chordsService.getResponseTimeAvg()/1000).toFixed(1) + " s" : (chordsService.getResponseTimeAvg()).toFixed(0) + " ms" }}
+</h3>

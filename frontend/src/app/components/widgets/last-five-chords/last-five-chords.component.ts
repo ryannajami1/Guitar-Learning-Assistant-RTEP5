@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {ChordPlayedService} from '../../../services/chord-played.service';
+import {ChordsService} from '../../../services/chords.service';
 import {CommonModule} from '@angular/common';
 import {EChordStatus} from '../../../models/chord-status.enum';
 
@@ -13,7 +13,7 @@ import {EChordStatus} from '../../../models/chord-status.enum';
 export class LastFiveChordsComponent {
   EChordStatus = EChordStatus;
 
-  constructor(public chordPlayedService: ChordPlayedService) {
+  constructor(public chordsService: ChordsService) {
   }
 
 }
