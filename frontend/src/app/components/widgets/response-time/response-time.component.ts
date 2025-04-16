@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {ChordsService} from '../../../services/chords.service';
 
 @Component({
   selector: 'app-response-time',
@@ -9,4 +10,6 @@ import { Component } from '@angular/core';
 })
 export class ResponseTimeComponent {
 
+  constructor(public chordsService: ChordsService) {
+  }
 }

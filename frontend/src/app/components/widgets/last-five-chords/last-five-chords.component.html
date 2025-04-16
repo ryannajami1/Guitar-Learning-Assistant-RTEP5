@@ -1,5 +1,5 @@
 <div style="display: flex; flex-direction: row"
-     *ngFor="let chordStatus of this.chordPlayedService.getLast5Chords(); let i = index">
+     *ngFor="let chordStatus of this.chordsService.getLast5Chords(); let i = index">
   <div>
     <i *ngIf="chordStatus === this.EChordStatus.Correct" class="pi pi-check-circle"
        style="font-size: 1.5rem; display: inline-block;"></i>
