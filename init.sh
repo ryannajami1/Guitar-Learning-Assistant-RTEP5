@@ -1,21 +1,29 @@
 #!/bin/sh
+set -e
 
 auto_yes=false
+ci_mode=false
 
 for arg in "$@"; do
   if [ "$arg" = "-y" ]; then
     auto_yes=true
-    break
+  elif [ "$arg" = "--ci" ]; then
+    ci_mode=true
   fi
 done
 
 run_apt() {
   local command="$1"
   shift
+  local prefix=""
+  if [ "$ci_mode" = false ]; then
+    prefix="sudo"
+  fi
+
   if "$auto_yes"; then
-    sudo "$command" -y "$@"
+    "$prefix" "$command" -y "$@"
   else
-    sudo "$command" "$@"
+    "$prefix" "$command" "$@"
   fi
 }
 
