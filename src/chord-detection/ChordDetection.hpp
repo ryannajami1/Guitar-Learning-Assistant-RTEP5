@@ -34,7 +34,10 @@ public:
     int NoteNumber(float frequency);
 
     // Lookup chord based on a list of note numbers
-    string ChordLookup(vector<int> notes);
+    string ChordLookup(vector<float> frequencies);
+
+    // Get peak frequencies from fft output
+    vector<float> GetPeakFrequencies(vector<float> frequencies, vector<float> magnitudes);
 };
 
 #endif

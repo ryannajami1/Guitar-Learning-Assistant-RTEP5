@@ -70,6 +70,27 @@ float ChordDetection::CalculateNoiseFloor(const vector<float> &data) {
     return sum / data.size();
 }
 
+vector<float> ChordDetection::GetPeakFrequencies(vector<float> frequencies, vector<float> magnitudes) {
+    	// Calculate the noise floor to adjust the threshold
+	float noise_floor = CalculateNoiseFloor(magnitudes);
+	float threshold = noise_floor * 30;
+
+	// Run peak detection function
+	std::vector<int> peak_indexes = determine_peaks(magnitudes, threshold, 0.5, 1);
+
+	// Get frequencies of peaks
+	std::vector<float> peak_frequencies;
+	for (int peak_index : peak_indexes) {
+		// Make sure freq is within bounds
+		float freq = frequencies[peak_index];
+		if (freq > 15) {
+		    peak_frequencies.push_back(frequencies[peak_index]);
+		}
+	}
+
+    return peak_frequencies;
+}
+
 string ChordDetection::NoteName(int note_num) {
     vector<string> notes = {"A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"};
     
@@ -199,7 +220,14 @@ vector<int> remove_non_duplicates(vector<int> vec) {
 }
 
 // string ChordDetection::ChordLookup(vector<int> notes, int root) {
-string ChordDetection::ChordLookup(vector<int> notes) {
+string ChordDetection::ChordLookup(vector<float> frequencies) {
+
+    // Get the note numbers from the peak freqeuncies
+	std::vector<int> notes;
+	for (float freq : frequencies) {
+                notes.push_back(NoteNumber(freq));
+	}
+
     // Check if there are any notes
     if (notes.size() == 0) {
 	return "";

@@ -142,31 +142,6 @@ auto GuitarFFTProcessor::Initialize() -> bool {
     return true;
 }
 
-// Add a frame to the buffer and process if we have enough frames
-void GuitarFFTProcessor::AddFrame(std::array<int16_t, FRAMES> &frame) {
-    // Copy the frame into buffer
-    std::memcpy(frame_buffer_.data() + buffer_position_, frame.begin(),
-                samples_per_frame_ * sizeof(int16_t));
-
-    // Update position and frame count
-    buffer_position_ += samples_per_frame_;
-    if (buffer_position_ >= frame_buffer_.size()) {
-        buffer_position_ = 0; // Wrap around if needed
-    }
-
-    frames_collected_++;
-
-    // If we have enough frames, process them
-    if (frames_collected_ >= frames_to_collect_) {
-        // Process the collected frames
-        // ProcessFrames();
-
-        // Reset frame counter but keep the buffer position
-        // (this creates a sliding window effect)
-        frames_collected_ = frames_to_collect_ / 2; // 50% overlap
-    }
-}
-
 // Process the collected frames
 void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
     frame_buffer_ = buf;
@@ -184,12 +159,10 @@ void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
     FindFrequencyPeaks();
     PrintFrequencyPeaks();
 
-    // Finlay
-	// Get the Chord
+    // Find the chord
 	ChordDetection cd;
-	std::vector<int> notes;
 
-	// convert to magnitudes and calc frequencies
+	// Convert fft data to vectors of magnitudes and frequencies
 	std::vector<float> fft_mags;
 	std::vector<float> fft_freqs;
 
@@ -203,35 +176,10 @@ void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
 		fft_freqs.push_back(frequency);
 	}
 
-	// Find the peaks
-	// Calculate the noise floor
-	float noise_floor = cd.CalculateNoiseFloor(fft_mags);
-	float threshold = noise_floor * 30;
+	// Get the peak frequencies from the FFT data
+    std::vector<float> peak_frequencies = cd.GetPeakFrequencies(fft_freqs, fft_mags);
 
-	// Run peak detection function
-	std::vector<int> peak_indexes = cd.determine_peaks(fft_mags, threshold, 0.5, 1);
-
-	// Get frequencies of peaks
-	std::vector<float> peak_frequencies;
-	for (int peak_index : peak_indexes) {
-		// Make sure freq is within bounds
-		float freq = fft_freqs[peak_index];
-		if (freq > 15) {
-		    peak_frequencies.push_back(fft_freqs[peak_index]);
-		}
-	}
-
-	// Get the note numbers from the peak freqeuncies
-	for (float freq : peak_frequencies) {
-                notes.push_back(cd.NoteNumber(freq));
-	}
-
-	// Print the frequencies and notes
-	std::cout << "Freqs and Notes\n";
-	for (unsigned int i = 0; i < peak_frequencies.size(); i++) {
-		std::cout << "Freq: " << peak_frequencies[i] << " | Note: " << cd.NoteName(notes[i]) << std::endl;
-	}
-
+    // Get the chord name from the peak frequencies
 	string chord_name = cd.ChordLookup(notes);
 
 	std::cout << chord_name << std::endl;
