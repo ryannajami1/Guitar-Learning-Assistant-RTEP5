@@ -28,7 +28,7 @@ private:
     snd_pcm_hw_params_t* params; // pointer to audio stream parameters
     snd_pcm_uframes_t frames; // number of frames per period
 
-    int size; // size of each frame in bytes
+    snd_pcm_uframes_t size; // size of each frame in bytes
     int16_t* buffer; // buffer to store single frame
 
     std::array<int16_t, sample_array_size> sample_array;

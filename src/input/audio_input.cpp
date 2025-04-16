@@ -12,14 +12,15 @@
 
 // use the newer ALSA API
 #define ALSA_PCM_NEW_HW_PARAMS_API
+#include "biquad_bandstop.hpp"
 #include <alsa/asoundlib.h>
 #include <array>
-#include <vector>
+#include <cstdint>
 #include <functional>
 #include <iostream>
-#include <cstdint>
 #include <thread>
-#include "biquad_bandstop.hpp"
+#include <utility>
+#include <vector>
 
 /* Init 
  *
@@ -27,18 +28,18 @@
  */
 void AudioInput::init()
 {
-    int rc; // function return code
+    int ret_code; // function return code
     unsigned int val;
     int dir;
 
     // Open default PCM device for audio capture
     // defualt device is configured using alsaconfig
-    rc = snd_pcm_open(&handle, "default",
+    ret_code = snd_pcm_open(&handle, "default",
     SND_PCM_STREAM_CAPTURE, 0);
-    if (rc < 0) {
+    if (ret_code < 0) {
         fprintf(stderr,
         "unable to open pcm device: %s\n",
-        snd_strerror(rc));
+        snd_strerror(ret_code));
         exit(1);
     }
 
@@ -73,11 +74,11 @@ void AudioInput::init()
                         params, &frames, &dir);
 
     // write the parameters to the driver
-    rc = snd_pcm_hw_params(handle, params);
-    if (rc < 0) {
+    ret_code = snd_pcm_hw_params(handle, params);
+    if (ret_code < 0) {
         fprintf(stderr,
         "unable to set hw parameters: %s\n",
-        snd_strerror(rc));
+        snd_strerror(ret_code));
         exit(1);
     }
 
@@ -91,11 +92,11 @@ void AudioInput::init()
 
     // configure buffer to hold 1 period of frames
     size = frames; // only single channel used
-    buffer = (int16_t *) malloc(size);
+    buffer = static_cast<int16_t *>(malloc(size));
 
     if (size != sample_array_size)
     {
-       fprintf(stderr, "buffer incorrect size. Buffer size: %d, array: %zu\n", size, sample_array_size);
+       fprintf(stderr, "buffer incorrect size. Buffer size: %lu, array: %zu\n", size, sample_array_size);
        exit(1);
     }
 
@@ -111,25 +112,24 @@ void AudioInput::init()
  */
 void AudioInput::start_loop()
 {
-    int rc;
+    int ret_code;  // function return code
 
     // start the input reading loop
     while (!done){
     	// read samples in from buffer
     	// the snd_pcm_readi() function is blocking and reads in interleaved data
 	    // the sound device is configured for mono, so only 1 channel is actually read in
-    	rc = snd_pcm_readi(handle, buffer, frames);
-    	if (rc == -EPIPE) {
+    	ret_code = static_cast<int>(snd_pcm_readi(handle, buffer, frames));
+    	if (ret_code == -EPIPE) {
         	// EPIPE means overrun in the ALSA buffer
 	        fprintf(stderr, "overrun occurred\n");
         	snd_pcm_prepare(handle);
-        } else if (rc < 0) {
-            fprintf(stderr, "error from read: %s\n", snd_strerror(rc));
-        } else if (rc != (int)frames) {
-            fprintf(stderr, "short read, read %d frames\n", rc);
+        } else if (ret_code < 0) {
+            fprintf(stderr, "error from read: %s\n", snd_strerror(ret_code));
+        } else if (ret_code != static_cast<int>(frames)) {
+          fprintf(stderr, "short read, read %d frames\n", ret_code);
         }
 
-        
         // copy the buffer into C++ array object
         std::copy(buffer, buffer+size, sample_array.begin());
 
@@ -173,13 +173,7 @@ void AudioInput::record_period(std::array<int16_t, sample_array_size>& sample_ar
 
     if (periods_recorded == num_periods)
     {
-        // send the full buffer to the fft callback function in a new thread
-        // std::thread thr(callback_function, recording_buffer);
         callback_function(recording_buffer);
-
-        // allow the thread to run with the signal processing
-        // loop will return to the blocking ALSA read
-        // thr.detach();
 
         // clear the buffer ready for the next chord
         recording = false;
@@ -214,5 +208,5 @@ void AudioInput::close()
  */
 void AudioInput::register_callback(std::function<void(std::vector<int16_t>&)> new_callback)
 {
-    callback_function = new_callback;
+    callback_function = std::move(new_callback);
 }

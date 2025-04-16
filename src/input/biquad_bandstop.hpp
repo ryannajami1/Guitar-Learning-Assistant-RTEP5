@@ -7,8 +7,8 @@
 class BiquadBandstop
 {
 public:
-    void config(double f0, double fs, double Q);
-    int16_t process(int16_t in);
+    void config(double f_0, double f_s, double Q_factor);
+    int16_t process(int16_t new_input);
 
 private:
     double a0, a1, a2, b1, b2;
