@@ -13,11 +13,13 @@ import {WrongChordComponent} from '../../../widgets/wrong-chord/wrong-chord.comp
 import {TimeoutComponent} from '../../../widgets/timeout/timeout.component';
 import {ChordsService} from '../../../../services/chords.service';
 import {EChordStatus} from '../../../../models/chord-status.enum';
+import {WsService} from '../../../../services/ws.service';
+import {InputNumberModule} from 'primeng/inputnumber';
 
 @Component({
   selector: 'app-desktop-practice',
   standalone: true,
-  imports: [DialogModule, CorrectChordComponent, WrongChordComponent, TimeoutComponent, ChordSchematicComponent, TimerComponent, ButtonModule, ResponseTimeComponent, LastFiveChordsComponent, AccuracyComponent, ToggleSwitchModule, FormsModule],
+  imports: [DialogModule, InputNumberModule, CorrectChordComponent, WrongChordComponent, TimeoutComponent, ChordSchematicComponent, TimerComponent, ButtonModule, ResponseTimeComponent, LastFiveChordsComponent, AccuracyComponent, ToggleSwitchModule, FormsModule],
   templateUrl: './desktop-practice.component.html',
   styleUrl: './desktop-practice.component.scss'
 })
@@ -27,9 +29,35 @@ export class DesktopPracticeComponent {
   showChord: boolean = true;
   showSettings: boolean = false;
 
-  constructor(public chordPlayedService: ChordsService) {
+  constructor(public chordPlayedService: ChordsService,
+              private wsService: WsService) {
     this.chordPlayedService.getNewCurrentChord();
   }
+
+
+  messages: any[] = [];
+  newMessage: string = 'TEST';
+
+  ngOnInit() {
+    this.wsService.getMessages().subscribe((message) => {
+      this.messages.push(message);
+    });
+  }
+
+  sendMessage() {
+    if (this.newMessage.trim()) {
+      console.log('SEND MESSAGE')
+      this.wsService.sendMessage({chord: "A min"});
+      // this.newMessage = '';
+    }
+  }
+
+  getMessage() {
+    this.wsService.getMessages().subscribe((event) => {
+      console.log(event);
+    })
+  }
+
 
   openSettings(): void {
     this.showSettings = true;
