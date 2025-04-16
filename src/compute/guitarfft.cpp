@@ -180,7 +180,7 @@ void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
     std::vector<float> peak_frequencies = cd.GetPeakFrequencies(fft_freqs, fft_mags);
 
     // Get the chord name from the peak frequencies
-	string chord_name = cd.ChordLookup(notes);
+	string chord_name = cd.ChordLookup(peak_frequencies);
 
 	std::cout << chord_name << std::endl;
 }
