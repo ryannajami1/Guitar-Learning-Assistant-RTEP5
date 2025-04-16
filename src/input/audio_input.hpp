@@ -39,7 +39,7 @@ private:
     bool done = false;
     bool recording = false;
     int periods_recorded = 0;
-    int num_periods = 64; // number of periods to record in a buffer
+    int num_periods = 128; // number of periods to record in a buffer
 
     const int saturation_threshold = 32767;
     const int chord_threshold = 800;

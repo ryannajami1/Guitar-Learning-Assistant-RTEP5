@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "ChordDetection.hpp"
 #include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -95,10 +96,18 @@ map<vector<int>, string> triad_chord_table = {
     // Notes:       1-3-5-8
     // Intervals:    4,3,5
     {{4,3,5}, "Major"},
+    {{5,4,3}, "Major 1stInv"},
+    {{3,5,4}, "Major 2ndInv"},
+    {{4,3,5}, "Major"},
+    {{2,2,3,5}, "Major"},
     // Minor
     // Notes:       1-m3-5-8
     // Intervals:    3,4,5
     {{3,4,5}, "Minor"},
+    {{5,3,4}, "Minor 1stInv"},
+    {{4,5,3}, "Minor 2ndInv"},
+    {{2,1,4,5}, "Minor"},
+    //{{2,1,4,3,2} "Minor"},
     // Diminished
     // Notes:       1-m3-m5-8
     // Intervals:    3,3,6
@@ -119,55 +128,32 @@ map<vector<int>, string> triad_chord_table = {
     // Notes:       1-3-5-m7-8
     // Intervals:    4,3,3,2
     {{4,3,3,2}, "7"},
+    {{2,2,1,2,3,2}, "7"},
+    {{2,2,1,2,3,1,1}, "7"},
+    {{4,1,2,3,2}, "7"},
     // Major 7
     // Notes:       1-3-5-7-8
     // Intervals:    4,3,4,1
     {{4,3,4,1}, "Major 7"},
+    {{4,2,1,4,1}, "Major 7"},
+    {{2,2,2,1,4,1}, "Major 7"},
     // Minor 7
     // Notes:       1-m3-5-m7-8
     // Intervals:    3, 4,3, 2
     {{3,4,3,2}, "Minor 7"},
+    {{2,1,2,2,3,2}, "Minor 7"},
     // Major 6
     // Notes:       1-3-5-6-8
     // Intervals:    4,3,2,3
     {{4,3,2,3}, "Major 6"},
     // Minor 6
     // Notes:       1-m3-5-m6-8
-    // Intervals:    4, 3,1, 4
-    {{3,4,2,3}, "Minor 6"}
+    // Intervals:    3, 4,1, 4
+    {{3,4,1,4}, "Minor 6"}
 
 };
 
-// string ChordDetection::ChordLookup(vector<int> notes, int root) {
-string ChordDetection::ChordLookup(vector<int> notes) {
-    // Check if there are any notes
-    if (notes.size() == 0) {
-	return "";
-    }
-
-    // Find the root note
-    int root = notes[0] % 12;
-    if (root < 0) root += 12;
-
-    // Convert notes numbers to indexes
-    vector<int> notes_set = notes;
-
-    for (size_t i = 0; i < notes_set.size(); i++) {
-        int note_index = notes_set[i] % 12;
-        if (note_index < 0) {
-            note_index += 12;
-        }
-        notes_set[i] = note_index;
-    }
-
-    // Remove duplicates and sort
-    sort(notes_set.begin(), notes_set.end());
-    notes_set.erase(unique(notes_set.begin(), notes_set.end()), notes_set.end());
-
-    // Rotate to put root note first
-    auto root_it = find(notes_set.begin(), notes_set.end(), root);
-    rotate(notes_set.begin(), root_it, notes_set.end());
-
+string notes_set_to_chord_type(vector<int> notes_set) {
     // Print notes_set for debugging
     cout << "Notes set: ";
     for (int note : notes_set) {
@@ -191,12 +177,97 @@ string ChordDetection::ChordLookup(vector<int> notes) {
     }
     cout << endl;
 
-    // Find intervals and match chord
-    string chord_type = triad_chord_table[intervals];
+    // match the chord type
+    return triad_chord_table[intervals];
+}
+
+vector<int> remove_non_duplicates(vector<int> vec) {
+	unordered_map<int, int> num_occurences;
+
+	for (int num : vec) {
+		num_occurences[num]++;
+	}
+
+	vector<int> new_vector;
+	for (int num : vec) {
+		if (num_occurences[num] > 1) {
+			new_vector.push_back(num);
+		}
+	}
+
+	return new_vector;
+}
+
+// string ChordDetection::ChordLookup(vector<int> notes, int root) {
+string ChordDetection::ChordLookup(vector<int> notes) {
+    // Check if there are any notes
+    if (notes.size() == 0) {
+	return "";
+    }
+
+    // Remove duplicates where the same freq has had 2 very close peaks
+    notes.erase(unique(notes.begin(), notes.end()), notes.end());
+    std::cout << "-----------------\nNotes going into algo\n------------------\n";
+    for (int note : notes) { std::cout << "Number: " << note << " Note: " << NoteName(note) << std::endl; }
+
+    // Find the root note
+    int root = notes[0] % 12;
+    if (root < 0) root += 12;
+
+    // Strip ocatve information from notes
+    vector<int> octaveless_notes = notes;
+
+    for (size_t i = 0; i < octaveless_notes.size(); i++) {
+        int note_index = octaveless_notes[i] % 12;
+        if (note_index < 0) {
+            note_index += 12;
+        }
+        octaveless_notes[i] = note_index;
+    }
+
+    // Remove duplicates and sort
+    vector<int> notes_set = octaveless_notes;
+    sort(notes_set.begin(), notes_set.end());
+    notes_set.erase(unique(notes_set.begin(), notes_set.end()), notes_set.end());
+
+    // Rotate to put root note first
+    auto root_it = find(notes_set.begin(), notes_set.end(), root);
+    rotate(notes_set.begin(), root_it, notes_set.end());
+
+    string chord_type = notes_set_to_chord_type(notes_set);
+    // If couldn't find chord, remove root and try again
+    if (chord_type == "") {
+	std::cout << "Tryng next note as root\n";
+	notes_set.erase(notes_set.begin());
+	chord_type = notes_set_to_chord_type(notes_set);
+    }
+    // Next try removing any notes that only appear once
+    if (chord_type == "") {
+	std::cout << "Removing single notes\n";
+	vector<int> notes_set = remove_non_duplicates(octaveless_notes);
+	if (notes_set.size() > 0) {
+		root = notes_set[0];
+
+
+	        sort(notes_set.begin(), notes_set.end());
+	        notes_set.erase(unique(notes_set.begin(), notes_set.end()), notes_set.end());
+
+	        auto root_it = find(notes_set.begin(), notes_set.end(), root);
+	        rotate(notes_set.begin(), root_it, notes_set.end());
+
+		chord_type = notes_set_to_chord_type(notes_set);
+	} else {
+		chord_type = "";
+	}
+    }
+
+    // Check for inversions and change root note
+    if (chord_type == "Major 1stInv" || chord_type == "Minor 1stInv") { root += 5; }
+    else if (chord_type == "Major 2ndInv") { root += 8; }
+    else if (chord_type == "Minor 2ndInv") { root += 9; }
+    if (root >= 12) { root %= 12; }
+
     string root_note = ChordDetection::NoteName(root);
     string chord_name = root_note + " " + chord_type;
-
     return chord_name;
-
-    // If fails, ignore root and try matching again.
 }

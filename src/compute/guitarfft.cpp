@@ -2,8 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
-#include <algorithm>
-#include <string>
+#include <algorithm>#include <string>
 #include <fstream>
 #include <iomanip>
 #include <cstring>
@@ -186,56 +185,9 @@ public:
         // If we have enough frames, process them
         if (frames_collected >= frames_to_collect) {
             // Process the collected frames
-            process_frames();
+            //process_frames();
 
-            // Finlay
-            // Get the Chord
-            ChordDetection cd;
-            std::vector<int> notes;
-
-            // convert to magnitudes and calc frequencies
-            std::vector<float> fft_mags;
-	    std::vector<float> fft_freqs;
-
-            for (unsigned int i = 2; i < fft_size / 2 - 2; i++) {
-                float real = output_buffer[i][0];
-                float imag = output_buffer[i][1];
-                float magnitude = sqrt(real * real + imag * imag);
-                fft_mags.push_back(magnitude);
-
-		float frequency = static_cast<float>(i) * sample_rate / fft_size;
-		fft_freqs.push_back(frequency);
-            }
-
-	    // Find the peaks
-	    // Calculate the noise floor
-	    float noise_floor = cd.CalculateNoiseFloor(fft_mags);
-	    float threshold = noise_floor * 50;
-
-	    // Run peak detection function
-	    std::vector<int> peak_indexes = cd.determine_peaks(fft_mags, threshold, 0.1, 0);
-
-	    // Get frequencies of peaks
-	    std::vector<float> peak_frequencies;
-	    for (int peak_index : peak_indexes) {
-		peak_frequencies.push_back(fft_freqs[peak_index]);
-	    }
-
-	    // Get the note numbers from the peak freqeuncies
-            for (float freq : peak_frequencies) {
-                notes.push_back(cd.NoteNumber(freq));
-            }
-
-	    // Print the frequencies and notes
-	    std::cout << "Freqs and Notes\n";
-	    for (unsigned int i = 0; i < peak_frequencies.size(); i++) {
-		std::cout << "Freq: " << peak_frequencies[i] << " | Note: " << cd.NoteName(notes[i]) << std::endl;
-	    }
-
-            string chord_name = cd.ChordLookup(notes);
-
-            std::cout << chord_name << std::endl;
-
+            
             
             // Reset frame counter but keep the buffer position
             // (this creates a sliding window effect)
@@ -248,7 +200,8 @@ public:
     }
     
     // Process the collected frames
-    void process_frames() {
+    void process_frames(std::vector<int16_t> buf) {
+	frame_buffer = buf;
         // Copy data to FFTW input buffer with conversion to float and windowing
         for (unsigned int i = 0; i < fft_size; i++) {
             // Apply circular buffer logic to get the right sample
@@ -263,8 +216,67 @@ public:
         find_frequency_peaks();
         print_frequency_peaks();
 
+	// Finlay
+	// Get the Chord
+	ChordDetection cd;
+	std::vector<int> notes;
+
+	// convert to magnitudes and calc frequencies
+	std::vector<float> fft_mags;
+	std::vector<float> fft_freqs;
+
+	for (unsigned int i = 2; i < fft_size / 2 - 2; i++) {
+                float real = output_buffer[i][0];
+                float imag = output_buffer[i][1];
+                float magnitude = sqrt(real * real + imag * imag);
+                fft_mags.push_back(magnitude);
+
+		float frequency = static_cast<float>(i) * sample_rate / fft_size;
+		fft_freqs.push_back(frequency);
+	}
+
+	// Find the peaks
+	// Calculate the noise floor
+	float noise_floor = cd.CalculateNoiseFloor(fft_mags);
+	float threshold = noise_floor * 30;
+
+	// Run peak detection function
+	std::vector<int> peak_indexes = cd.determine_peaks(fft_mags, threshold, 0.5, 1);
+
+	// Get frequencies of peaks
+	std::vector<float> peak_frequencies;
+	for (int peak_index : peak_indexes) {
+		// Make sure freq is within bounds
+		float freq = fft_freqs[peak_index];
+		if (freq > 15) {
+		    peak_frequencies.push_back(fft_freqs[peak_index]);
+		}
+	}
+
+	// Use Ryans Peak detection results instead
+	//peak_frequencies.clear();
+	//for (FrequencyPeak fp : frequency_peaks) {
+	//	peak_frequencies.push_back(fp.frequency);
+	//}
+
+
+	// Get the note numbers from the peak freqeuncies
+	for (float freq : peak_frequencies) {
+                notes.push_back(cd.NoteNumber(freq));
+	}
+
+	// Print the frequencies and notes
+	std::cout << "Freqs and Notes\n";
+	for (unsigned int i = 0; i < peak_frequencies.size(); i++) {
+		std::cout << "Freq: " << peak_frequencies[i] << " | Note: " << cd.NoteName(notes[i]) << std::endl;
+	}
+
+	string chord_name = cd.ChordLookup(notes);
+
+	std::cout << chord_name << std::endl;
+
+
     }
-    
     // Get frequency peaks for chord detection
     std::vector<std::pair<float, float>> get_frequency_peaks() const {
         std::vector<std::pair<float, float>> result;
@@ -351,7 +363,7 @@ int main() {
     }
     
     in.register_callback([&processor](auto frame) {
-        processor.add_frame(frame);
+        processor.process_frames(frame);
     });
 
     in.init();
