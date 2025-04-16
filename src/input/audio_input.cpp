@@ -5,9 +5,7 @@
  * ALSA is configured to send 128 16-bit mono samples per period at a sameple rate of 8kHz
  *
  * TO DO:
- * - Add filtering for input data to allow for downsampling
- * - Could check for a chord being played () and only pass data to the FFT when a chord has been played
- * - Could add check for the input saturating and output an error message (or reduce gain directly in the program?)
+ * - Add low-pass filtering for input data to allow for downsampling
  */
 
 #include "audio_input.hpp"
@@ -16,10 +14,12 @@
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
 #include <array>
+#include <vector>
 #include <functional>
 #include <iostream>
 #include <cstdint>
 #include <thread>
+#include "biquad_bandstop.hpp"
 
 /* Init 
  *
@@ -99,6 +99,8 @@ void AudioInput::init()
        exit(1);
     }
 
+    // configure the biquad filter for 50 Hz rejection
+    bandstop_filter.config(50, 8000, 50);
 }
 
 
@@ -127,15 +129,62 @@ void AudioInput::start_loop()
             fprintf(stderr, "short read, read %d frames\n", rc);
         }
 
+        
         // copy the buffer into C++ array object
         std::copy(buffer, buffer+size, sample_array.begin());
 
-        // call the callback function with the new data in a new thread
-        std::thread thr(callback_function, sample_array);
+        // iterate over the received sample buffer and filter
+        for (uint8_t i=0; i<sample_array_size; i++)
+        {
+            sample_array[i] = bandstop_filter.process(sample_array[i]);
+        }
+
+        // iterate over the filtered array to check the amplitude of each sample
+        for (uint8_t i=0; i<sample_array_size; i++)
+        {
+            if (sample_array[i] >= saturation_threshold)
+            {
+                std::cerr << "Input Clipping!" << std::endl;
+            }
+            if ((sample_array[i] >= chord_threshold) and !recording)
+            {
+                std::cerr << "Chord detected" << std::endl;
+                recording = true;
+            }
+        }
+
+        if (recording)
+        {
+            record_period(sample_array);
+        }
+    }
+}
+
+/* Record Period
+ * 
+ * When a chord has been detected, record samples into a buffer for a predefined length of time
+ * When the buffer is full, call a callback to send the buffer to the FFT
+ */
+void AudioInput::record_period(std::array<int16_t, sample_array_size>& sample_array)
+{
+    recording_buffer.insert(recording_buffer.end(), sample_array.begin(), sample_array.end());
+
+    periods_recorded++;
+
+    if (periods_recorded == num_periods)
+    {
+        // send the full buffer to the fft callback function in a new thread
+        // std::thread thr(callback_function, recording_buffer);
+        callback_function(recording_buffer);
 
         // allow the thread to run with the signal processing
         // loop will return to the blocking ALSA read
-        thr.detach();
+        // thr.detach();
+
+        // clear the buffer ready for the next chord
+        recording = false;
+        periods_recorded = 0;
+        recording_buffer.clear();
     }
 }
 
@@ -163,7 +212,7 @@ void AudioInput::close()
  *
  * Register the function that will be called when a new audio sample buffer is ready
  */
-void AudioInput::register_callback(std::function<void(std::array<int16_t, sample_array_size>&)> new_callback)
+void AudioInput::register_callback(std::function<void(std::vector<int16_t>&)> new_callback)
 {
     callback_function = new_callback;
 }
