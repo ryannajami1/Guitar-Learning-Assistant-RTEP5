@@ -1,9 +1,9 @@
 #include "biquad_bandstop.hpp"
 
-void BiquadBandstop::config(double f0, double fs, double Q)
+void BiquadBandstop::config(double f_0, double f_s, double Q_factor)
 {
-    double omega = 2.0 * M_PI * f0 / fs;
-    double alpha = sin(omega) / (2.0 * Q);
+    double omega = 2.0 * M_PI * f_0 / f_s;
+    double alpha = sin(omega) / (2.0 * Q_factor);
     double cos_omega = cos(omega);
 
     a0 = 1.0;
@@ -21,17 +21,19 @@ void BiquadBandstop::config(double f0, double fs, double Q)
     b2 /= a0_norm;
 }
 
-int16_t BiquadBandstop::process(int16_t input)
-{
-    // Convert input to float
-    double in = static_cast<double>(input);
-    double out = a0 * in + z1;
-    z1 = a1 * in + z2 - b1 * out;
-    z2 = a2 * in - b2 * out;
+auto BiquadBandstop::process(int16_t new_input) -> int16_t {
+  // Convert input to float
+  auto in_val = static_cast<double>(new_input);
+  double out = a0 * in_val + z1;
+  z1 = a1 * in_val + z2 - b1 * out;
+  z2 = a2 * in_val - b2 * out;
 
-    // Clip result to int16_t range
-    if (out > 32767.0) out = 32767.0;
-    else if (out < -32768.0) out = -32768.0;
+  // Clip result to int16_t range
+  if (out > 32767.0) {
+    out = 32767.0;
+  } else if (out < -32768.0) {
+    out = -32768.0;
+  }
 
-    return static_cast<int16_t>(out);
+  return static_cast<int16_t>(out);
 }
