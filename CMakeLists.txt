@@ -15,6 +15,6 @@ enable_testing()
 
 
 # Add the src subdirectory
-add_subdirectory(helloworld)
+add_subdirectory(websocket)
 add_subdirectory(src)
 add_subdirectory(tests)
