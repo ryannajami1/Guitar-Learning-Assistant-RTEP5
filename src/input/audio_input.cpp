@@ -9,6 +9,8 @@
  */
 
 #include "audio_input.hpp"
+#include <cerrno>
+#include <cstdlib>
 
 // use the newer ALSA API
 #define ALSA_PCM_NEW_HW_PARAMS_API
@@ -18,9 +20,6 @@
 #include <cstdint>
 #include <functional>
 #include <iostream>
-#include <thread>
-#include <utility>
-#include <vector>
 
 /* Init 
  *

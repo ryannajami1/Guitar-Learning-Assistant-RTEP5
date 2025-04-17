@@ -4,12 +4,11 @@
 */
 #include "audio_input.hpp"
 
-#include <cstdint>
 #include <iostream>
 
-AudioInput audio_in;
+static AudioInput audio_in;
 
-void Callback(std::vector<int16_t> &sample_buffer) {
+static void Callback(std::vector<int16_t> &sample_buffer) {
   std::cerr << "Chord detected" << std::endl;
 
   for (const auto &val : sample_buffer) {
