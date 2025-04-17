@@ -1,23 +1,28 @@
 #include "../src/compute/guitarfft.hpp"
-#include <cmath>
-#include <vector>
 #include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
+#include <math.h>
 
 // Function to generate a sine wave at a specific frequency
-void GenerateSineWave(std::array<int16_t, FRAMES> &buffer, float frequency,
-                      float amplitude, float sample_rate) {
+static void GenerateSineWave(std::array<int16_t, FRAMES> &buffer,
+                             float frequency, float amplitude,
+                             float sample_rate) {
   for (size_t i = 0; i < buffer.size(); i++) {
-    float time = static_cast<float>(i) / sample_rate;
-    double value = amplitude * sin(2.0F * M_PI *static_cast<double>(frequency) *static_cast<double>(time));
+    float const time = static_cast<float>(i) / sample_rate;
+    double const value =
+        amplitude * sin(2.0F * M_PI * static_cast<double>(frequency) *
+                        static_cast<double>(time));
     buffer[i] = static_cast<int16_t>(value);
   }
 }
 
 // Function to generate a guitar chord (multiple frequencies)
-void GenerateGuitarChord(std::array<int16_t, FRAMES> &buffer,
-                         const std::vector<float> &frequencies, float amplitude,
-                         float sample_rate) {
+static void GenerateGuitarChord(std::array<int16_t, FRAMES> &buffer,
+                                const std::vector<float> &frequencies,
+                                float amplitude, float sample_rate) {
   std::fill(buffer.begin(), buffer.end(), 0);
 
   // Temporary buffer for each frequency
@@ -37,10 +42,10 @@ void GenerateGuitarChord(std::array<int16_t, FRAMES> &buffer,
 }
 
 // Test function that checks if the detected frequencies match the expected ones
-auto ValidateFrequencies(
-    const std::vector<std::pair<float, float>> &detected_peaks,
-    const std::vector<float> &expected_frequencies, float tolerance = 10.0F)
-    -> bool {
+static auto
+ValidateFrequencies(const std::vector<std::pair<float, float>> &detected_peaks,
+                    const std::vector<float> &expected_frequencies,
+                    float tolerance = 10.0F) -> bool {
   // Check that we detect at least one peak
   if (detected_peaks.empty()) {
     std::cerr << "No frequency peaks detected!" << std::endl;
