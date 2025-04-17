@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <math.h>
 
 // Function to generate a sine wave at a specific frequency
 static void GenerateSineWave(std::array<int16_t, FRAMES> &buffer,
