@@ -1,12 +1,13 @@
 #pragma once
 
+#include "fftw3.h"
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "fftw3.h"
 
-#define FRAMES 128
+enum { FRAMES = 128 };
 
 class GuitarFFTProcessor {
 private:
@@ -35,9 +36,10 @@ private:
     std::vector<FrequencyPeak> frequency_peaks_;
 
     void CreateWindow();
-    void FindFrequencyPeaks(float threshold_percent = 5.0F, std::size_t max_peaks = 10);
+    void FindFrequencyPeaks(float threshold_percent = 5.0F,
+                            std::size_t max_peaks = 10);
 
-public:
+  public:
     explicit GuitarFFTProcessor(unsigned int frame_size = FRAMES, 
                                unsigned int rate = 2000,
                                unsigned int frames_to_process = FRAMES);
