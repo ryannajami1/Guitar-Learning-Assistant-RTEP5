@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <vector>
 
 constexpr size_t sample_array_size = 128;
 
