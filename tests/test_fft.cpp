@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
-#include <math.h>
 
 // Function to generate a sine wave at a specific frequency
 static void GenerateSineWave(std::array<int16_t, FRAMES> &buffer,
@@ -30,7 +29,7 @@ static void GenerateGuitarChord(std::array<int16_t, FRAMES> &buffer,
 
   // Add each frequency component
   for (const auto &freq : frequencies) {
-    GenerateSineWave(temp_buffer, freq, amplitude / frequencies.size(),
+    GenerateSineWave(temp_buffer, freq, amplitude / static_cast<float>(frequencies.size()),
                      sample_rate);
 
     // Sum into the main buffer

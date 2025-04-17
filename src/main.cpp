@@ -26,7 +26,7 @@ auto main() -> int {
   // Create processor for Sampled frames at 2kHz
   // Will collect frames (total 1024 samples) before processing
   GuitarFFTProcessor processor(FRAMES, 2000, FRAMES);
-  AudioInput in;
+  AudioInput audio_in;
 
   // Initialize the processor
   if (!processor.Initialize()) {
@@ -34,13 +34,13 @@ auto main() -> int {
     return 1;
   }
 
-  in.register_callback(
+  audio_in.register_callback(
       [&processor](auto frame) { processor.ProcessFrames(frame); });
 
-  in.init();
+      audio_in.init();
 
   // Audio input thread
-  std::thread t_audio([&in]() { in.start_loop(); });
+  std::thread t_audio([&audio_in]() { audio_in.start_loop(); });
 
   // Websocket thread
   std::thread t_websocket([]() {

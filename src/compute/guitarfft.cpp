@@ -9,7 +9,6 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <cmath>
 #include <string>
 #include <vector>
 
@@ -19,16 +18,16 @@ auto GuitarFFTProcessor::FrequencyPeak::operator<(const FrequencyPeak &other) co
 }
 
 // Create Hann window for reducing spectral leakage
-void GuitarFFTProcessor::CreateWindow() const {
+void GuitarFFTProcessor::CreateWindow() {
   window_.resize(fft_size_);
   for (unsigned int i = 0; i < fft_size_; i++) {
-    window_[i] = 0.5F * (1.0F - cos(2.0F * M_PI * i / (fft_size_ - 1)));
+    window_[i] = 0.5F * (1.0F - cos(2.0F * static_cast<float>(M_PI) * static_cast<float>(i) / static_cast<float>(fft_size_ - 1)));
   }
 }
 
 // Find peaks in the frequency spectrum
 void GuitarFFTProcessor::FindFrequencyPeaks(float threshold_percent,
-                                            std::size_t max_peaks) const {
+                                            std::size_t max_peaks) {
   frequency_peaks_.clear();
 
   // Calculate maximum magnitude for threshold calculation
@@ -100,7 +99,7 @@ GuitarFFTProcessor::GuitarFFTProcessor(unsigned int frame_size, unsigned int rat
       frames_to_collect_(frames_to_process),
       input_buffer_(nullptr),
       output_buffer_(nullptr),
-      frame_buffer_(frame_size * frames_to_process),
+      frame_buffer_(static_cast<size_t>(frame_size) * frames_to_process),
       buffer_position_(0),
       frames_collected_(0) {
 }
@@ -142,7 +141,7 @@ auto GuitarFFTProcessor::Initialize() -> bool {
 
 // Process the collected frames
 void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
-    frame_buffer_ = buf;
+    frame_buffer_ = std::move(buf);
     // Copy data to FFTW input buffer with conversion to float and windowing
     for (unsigned int i = 0; i < fft_size_; i++) {
         // Apply circular buffer logic to get the right sample
@@ -157,38 +156,34 @@ void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
     FindFrequencyPeaks();
     PrintFrequencyPeaks();
 
-    // Find the chord
-	ChordDetection cd;
+  // Convert fft data to vectors of magnitudes and frequencies
+  std::vector<float> fft_mags;
+  std::vector<float> fft_freqs;
 
-	// Convert fft data to vectors of magnitudes and frequencies
-	std::vector<float> fft_mags;
-	std::vector<float> fft_freqs;
-
-	for (unsigned int i = 2; i < fft_size_ / 2 - 2; i++) {
+  for (unsigned int i = 2; i < fft_size_ / 2 - 2; i++) {
         float real = output_buffer_[i][0];
         float imag = output_buffer_[i][1];
         float magnitude = std::sqrt((real * real) + (imag * imag));
         fft_mags.push_back(magnitude);
 
-		float frequency = static_cast<float>(i) * sample_rate_ / fft_size_;
-		fft_freqs.push_back(frequency);
-	}
+    float frequency = static_cast<float>(i) * static_cast<float>(sample_rate_) / static_cast<float>(fft_size_);
+    fft_freqs.push_back(frequency);
+  }
 
-	// Get the peak frequencies from the FFT data
-    std::vector<float> peak_frequencies = cd.GetPeakFrequencies(fft_freqs, fft_mags);
+  // Get the peak frequencies from the FFT data
+    std::vector<float> peak_frequencies = ChordDetection::GetPeakFrequencies(fft_freqs, fft_mags);
 
     // Get the chord name from the peak frequencies
-	string chord_name = cd.ChordLookup(peak_frequencies);
+  std::string chord_name = ChordDetection::ChordLookup(peak_frequencies);
 
-	std::cout << chord_name << std::endl;
+  std::cout << chord_name << std::endl;
 
-	// Send chord message over websocket
-	LWS_SendMessage(chord_name);
+  // Send chord message over websocket
+  LWS_SendMessage(chord_name);
 }
 
 // Get frequency peaks for chord detection
-static auto GuitarFFTProcessor::GetFrequencyPeaks()
-    -> std::vector<std::pair<float, float>> {
+auto GuitarFFTProcessor::GetFrequencyPeaks() const -> std::vector<std::pair<float, float>> {
   std::vector<std::pair<float, float>> result;
   result.reserve(frequency_peaks_.size());
 
@@ -221,7 +216,7 @@ void GuitarFFTProcessor::WriteFrequencyDataToFile(const std::string &filename) {
 }
 
 // Print frequency peaks to console
-void GuitarFFTProcessor::PrintFrequencyPeaks() {
+void GuitarFFTProcessor::PrintFrequencyPeaks(){
     std::cout << "--- Detected Frequency Peaks ---" << std::endl;
     for (const auto &peak : frequency_peaks_) {
         std::cout << "Frequency: " << std::fixed << std::setprecision(2)

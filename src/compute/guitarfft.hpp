@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 enum { FRAMES = 128 };
 
@@ -34,9 +35,9 @@ private:
 
     std::vector<FrequencyPeak> frequency_peaks_;
 
-    void CreateWindow() const;
+    void CreateWindow();
     void FindFrequencyPeaks(float threshold_percent = 5.0F,
-                            std::size_t max_peaks = 10) const;
+                            std::size_t max_peaks = 10);
 
   public:
     explicit GuitarFFTProcessor(unsigned int frame_size = FRAMES, 
@@ -48,9 +49,9 @@ private:
     void AddFrame(std::array<int16_t, FRAMES> &frame);
     void ProcessFrames(std::vector<int16_t> buf);
     [[nodiscard]] auto GetFrequencyPeaks() const -> std::vector<std::pair<float, float>>;
-    static void WriteFrequencyDataToFile(const std::string &filename);
-    static void PrintFrequencyPeaks();
+    void WriteFrequencyDataToFile(const std::string &filename);
+    void PrintFrequencyPeaks();
     [[nodiscard]] auto GetFramesCollected() const -> unsigned int;
     [[nodiscard]] auto GetFramesNeeded() const -> unsigned int;
-    static void Cleanup();
+    void Cleanup();
 };
