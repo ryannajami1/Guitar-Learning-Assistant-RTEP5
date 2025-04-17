@@ -12,12 +12,17 @@
 #include <string>
 #include <vector>
 
-// Implementation of FrequencyPeak operator<
+// * This program processes the Fast Fourier Transform of input signals received
+// * The program uses the audio signals to determine the dominant frequencies of the chord played
+// * Modified to work with small frame sizes (No. of samples) by collecting multiple frames.
+
+// Sort strongest peaks first to focus on the most important frequencies
 auto GuitarFFTProcessor::FrequencyPeak::operator<(const FrequencyPeak &other) const -> bool {
     return magnitude > other.magnitude; // Sort in descending order
 }
 
-// Create Hann window for reducing spectral leakage
+// Create smooth curve at signal edges to avoid false frequencies
+// Reduces spectral leakage
 void GuitarFFTProcessor::CreateWindow() {
   window_.resize(fft_size_);
   for (unsigned int i = 0; i < fft_size_; i++) {
@@ -25,12 +30,12 @@ void GuitarFFTProcessor::CreateWindow() {
   }
 }
 
-// Find peaks in the frequency spectrum
+// Find the dominant peaks in the frequency spectrum
 void GuitarFFTProcessor::FindFrequencyPeaks(float threshold_percent,
                                             std::size_t max_peaks) {
   frequency_peaks_.clear();
 
-  // Calculate maximum magnitude for threshold calculation
+  // Calculate maximum magnitude (loudest note) for threshold calculation
   float max_magnitude = 0.0F;
   for (unsigned int i = 1; i < fft_size_ / 2; i++) {
     float real = output_buffer_[i][0];
@@ -40,9 +45,10 @@ void GuitarFFTProcessor::FindFrequencyPeaks(float threshold_percent,
   }
 
   // Calculate threshold value
+  // This ignores the sounds played below a certain volume (relative to the loudest note)
   float const threshold = max_magnitude * threshold_percent / 100.0F;
 
-  // Find local maxima that exceed the threshold
+  // Find local maxima that exceed the threshold - frequencies that stand out
   for (unsigned int i = 2; i < fft_size_ / 2 - 2; i++) {
     float real = output_buffer_[i][0];
     float imag = output_buffer_[i][1];
@@ -66,26 +72,27 @@ void GuitarFFTProcessor::FindFrequencyPeaks(float threshold_percent,
       if (magnitude > prev_mag1 && magnitude > prev_mag2 &&
           magnitude > next_mag1 && magnitude > next_mag2) {
 
-        // Calculate the frequency
+        // Frequency calculation
         float const frequency = static_cast<float>(i) *
                                 static_cast<float>(sample_rate_) /
                                 static_cast<float>(fft_size_);
 
-        // Skip very low frequencies (DC and near-DC components)
+        // Skip very low frequencies (DC and near-DC components), things that aren't muscial notes
         if (frequency < 50.0F) {
           continue;
         }
 
-        // Add to peaks
+        
         frequency_peaks_.push_back({frequency, magnitude});
       }
     }
   }
 
-  // Sort peaks by magnitude (descending)
+  
   std::sort(frequency_peaks_.begin(), frequency_peaks_.end());
 
   // Limit to top max_peaks (or fewer if there aren't that many)
+  // This focuses on the clearest notes to avoid confusion
   if (frequency_peaks_.size() > max_peaks) {
     frequency_peaks_.resize(max_peaks);
   }
@@ -122,6 +129,7 @@ auto GuitarFFTProcessor::Initialize() -> bool {
     }
 
     // Create FFT plan
+    // Plans out sound analysis
     fft_plan_ = fftwf_plan_dft_r2c_1d(static_cast<int>(fft_size_), input_buffer_, output_buffer_,
                                     FFTW_MEASURE);
 
@@ -133,16 +141,18 @@ auto GuitarFFTProcessor::Initialize() -> bool {
     // Initialize window function
     CreateWindow();
 
-    // Clear the frame buffer
+    
     std::fill(frame_buffer_.begin(), frame_buffer_.end(), 0);
 
     return true;
 }
 
 // Process the collected frames
+// Raw audio signals are converted into distinct notes
 void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
     frame_buffer_ = std::move(buf);
     // Copy data to FFTW input buffer with conversion to float and windowing
+    // Prepares the sample by normalizing values
     for (unsigned int i = 0; i < fft_size_; i++) {
         // Apply circular buffer logic to get the right sample
         unsigned int buffer_index = (buffer_position_ + i) % frame_buffer_.size();
@@ -150,6 +160,7 @@ void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
     }
 
     // Perform FFT
+    // Frequencies are seperated using FFTW3
     fftwf_execute(fft_plan_);
 
     // Find frequency peaks
@@ -216,6 +227,7 @@ void GuitarFFTProcessor::WriteFrequencyDataToFile(const std::string &filename) {
 }
 
 // Print frequency peaks to console
+// Shows what kind of notes are being heard
 void GuitarFFTProcessor::PrintFrequencyPeaks(){
     std::cout << "--- Detected Frequency Peaks ---" << std::endl;
     for (const auto &peak : frequency_peaks_) {
@@ -232,11 +244,12 @@ auto GuitarFFTProcessor::GetFramesCollected() const -> unsigned int {
 }
 
 // Get the number of frames needed for processing
+// Returns the required frame number for a complete analysis
 auto GuitarFFTProcessor::GetFramesNeeded() const -> unsigned int {
     return frames_to_collect_;
 }
 
-// Clean up resources
+// Clean up 
 void GuitarFFTProcessor::Cleanup() {
     if (fft_plan_ != nullptr) {
         fftwf_destroy_plan(fft_plan_);
