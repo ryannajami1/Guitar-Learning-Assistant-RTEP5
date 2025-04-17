@@ -1,7 +1,6 @@
 #include "biquad_bandstop.hpp"
 #include <cmath>
 #include <cstdint>
-#include <math.h>
 
 void BiquadBandstop::config(double f_0, double f_s, double Q_factor)
 {

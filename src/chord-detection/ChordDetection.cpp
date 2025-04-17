@@ -8,7 +8,17 @@
 #include <unordered_map>
 #include <vector>
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::cout;
+using std::map;
+using std::unordered_map;
+using std::log2;
+using std::round;
+using std::sort;
+using std::unique;
+using std::find;
+using std::rotate;
 
 /* Terms used
 * ===========
@@ -89,16 +99,16 @@ static map<vector<int>, string> chord_interval_table = {
 // Peak detection algorithm
 static auto DeterminePeaks(const vector<float> &data, float threshold,
                            float min_height, float /*min_width*/)
-    -> vector<int> {
+    -> vector<size_t> {
 
   float mask_top = data[0];
   float mask_bottom = mask_top - min_height;
 
   float highest = data[0];
-  int highest_index = 0;
+  size_t highest_index = 0;
   float lowest = data[0];
 
-  vector<int> peak_indices;
+  vector<size_t> peak_indices;
 
   ChordDetection::State state = ChordDetection::kUnknown;
 
@@ -144,7 +154,7 @@ static auto CalculateNoiseFloor(const vector<float> &data) -> float {
   for (float const value : data) {
     sum += value;
   }
-  return sum / data.size();
+  return sum / static_cast<float>(data.size());
 }
 
 // Gets the peak frequencies from fft data
@@ -156,12 +166,12 @@ auto ChordDetection::GetPeakFrequencies(vector<float> frequencies,
   float const threshold = noise_floor * 30;
 
   // Run peak detection function
-  std::vector<int> const peak_indexes =
+  std::vector<size_t> const peak_indexes =
       DeterminePeaks(magnitudes, threshold, 0.5, 1);
 
   // Get frequencies of peaks
   std::vector<float> peak_frequencies;
-  for (int const peak_index : peak_indexes) {
+  for (size_t const peak_index : peak_indexes) {
     // Make sure freq is within bounds
     float const freq = frequencies[peak_index];
     if (freq > 15) {
@@ -202,7 +212,7 @@ static auto NotesSetToChordType(vector<int> notes_set) -> string {
 
   // Get the intervals between each note.
   vector<int> intervals;
-  int const len = notes_set.size();
+  size_t const len = notes_set.size();
   for (size_t i = 1; i <= len; i++) {
     int interval = notes_set[i % len] - notes_set[i - 1];
     if (interval < 0) {
