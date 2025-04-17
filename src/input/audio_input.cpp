@@ -1,12 +1,12 @@
 /* AUDIO INPUT
- * Craig Cochrane, 2025
- *
- * Get samples from ALSA PCM device and pass array to a callback function to calculate the FFT
- * ALSA is configured to send 128 16-bit mono samples per period at a sameple rate of 8kHz
- *
- * TO DO:
- * - Add low-pass filtering for input data to allow for downsampling
- */
+* Craig Cochrane, 2025
+*
+* Get samples from ALSA PCM device and pass array to a callback function to calculate the FFT
+* ALSA is configured to send 128 16-bit mono samples per period at a sameple rate of 8kHz
+*
+* TO DO:
+* - Add low-pass filtering for input data to allow for downsampling
+*/
 
 #include "audio_input.hpp"
 #include <cerrno>
@@ -22,9 +22,9 @@
 #include <iostream>
 
 /* Init 
- *
- * Configure the ALSA input device 
- */
+*
+* Configure the ALSA input device 
+*/
 void AudioInput::init()
 {
     int ret_code; // function return code
@@ -41,6 +41,12 @@ void AudioInput::init()
         snd_strerror(ret_code));
         exit(1);
     }
+
+     // allocate a hardware parameters object
+     snd_pcm_hw_params_alloca(&params);
+ 
+     // fill it in with default values
+     snd_pcm_hw_params_any(handle, params);
 
     // allocate a hardware parameters object
     // fill it in with default values
@@ -90,13 +96,13 @@ void AudioInput::init()
     std::cerr << "Number of frames per period: " << frames << std::endl;
 
     // configure buffer to hold 1 period of frames
-    size = frames; // only single channel used
+    size = frames * 2; // only single channel used, but 2 bytes per sample
     buffer = static_cast<int16_t *>(malloc(size));
 
-    if (size != sample_array_size)
+    if (size != sample_array_size * 2) // Compare in bytes
     {
-       fprintf(stderr, "buffer incorrect size. Buffer size: %lu, array: %zu\n", size, sample_array_size);
-       exit(1);
+    fprintf(stderr, "buffer incorrect size. Buffer size: %lu, array: %zu\n", size, sample_array_size * 2);
+    exit(1);
     }
 
     // configure the biquad filter for 50 Hz rejection
@@ -105,32 +111,34 @@ void AudioInput::init()
 
 
 /* Start Loop
- *
- * Start an infinite loop where the audio device is read from and the callback function called
- * Loop ends when the done variable is set to false by the end loop function
- */
+*
+* Start an infinite loop where the audio device is read from and the callback function called
+* Loop ends when the done variable is set to false by the end loop function
+*/
 void AudioInput::start_loop()
 {
     int ret_code;  // function return code
 
     // start the input reading loop
     while (!done){
-    	// read samples in from buffer
-    	// the snd_pcm_readi() function is blocking and reads in interleaved data
-	    // the sound device is configured for mono, so only 1 channel is actually read in
-    	ret_code = static_cast<int>(snd_pcm_readi(handle, buffer, frames));
-    	if (ret_code == -EPIPE) {
-        	// EPIPE means overrun in the ALSA buffer
-	        fprintf(stderr, "overrun occurred\n");
-        	snd_pcm_prepare(handle);
+        // read samples in from buffer
+        // the snd_pcm_readi() function is blocking and reads in interleaved data
+        // the sound device is configured for mono, so only 1 channel is actually read in
+        ret_code = static_cast<int>(snd_pcm_readi(handle, buffer, frames));
+        if (ret_code == -EPIPE) {
+            // EPIPE means overrun in the ALSA buffer
+            fprintf(stderr, "overrun occurred\n");
+            snd_pcm_prepare(handle);
         } else if (ret_code < 0) {
             fprintf(stderr, "error from read: %s\n", snd_strerror(ret_code));
         } else if (ret_code != static_cast<int>(frames)) {
-          fprintf(stderr, "short read, read %d frames\n", ret_code);
+        fprintf(stderr, "short read, read %d frames\n", ret_code);
         }
 
         // copy the buffer into C++ array object
-        std::copy(buffer, buffer+size, sample_array.begin());
+        for (long unsigned int i = 0; i < frames; ++i) {
+            sample_array[i] = buffer[i];
+        }
 
         // iterate over the received sample buffer and filter
         for (uint8_t i=0; i<sample_array_size; i++)
@@ -160,10 +168,9 @@ void AudioInput::start_loop()
 }
 
 /* Record Period
- * 
- * When a chord has been detected, record samples into a buffer for a predefined length of time
- * When the buffer is full, call a callback to send the buffer to the FFT
- */
+* * When a chord has been detected, record samples into a buffer for a predefined length of time
+* When the buffer is full, call a callback to send the buffer to the FFT
+*/
 void AudioInput::record_period(std::array<int16_t, sample_array_size>& sample_array)
 {
     recording_buffer.insert(recording_buffer.end(), sample_array.begin(), sample_array.end());
@@ -182,18 +189,18 @@ void AudioInput::record_period(std::array<int16_t, sample_array_size>& sample_ar
 }
 
 /* Stop Loop
- *
- * Set the done variable so that the loop is interrupted
- */
+*
+* Set the done variable so that the loop is interrupted
+*/
 void AudioInput::stop_loop()
 {
     done = true;
 }
 
 /* Close
- *
- * Close down the ALSA connection and free memory
- */
+*
+* Close down the ALSA connection and free memory
+*/
 void AudioInput::close()
 {
     snd_pcm_drop(handle); // discards remaining samples in the ALSA buffer
@@ -202,9 +209,9 @@ void AudioInput::close()
 }
 
 /* Register callback
- *
- * Register the function that will be called when a new audio sample buffer is ready
- */
+*
+* Register the function that will be called when a new audio sample buffer is ready
+*/
 void AudioInput::register_callback(std::function<void(std::vector<int16_t>&)> new_callback)
 {
     callback_function = std::move(new_callback);

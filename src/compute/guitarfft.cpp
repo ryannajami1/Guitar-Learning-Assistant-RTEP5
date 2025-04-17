@@ -99,7 +99,7 @@ GuitarFFTProcessor::GuitarFFTProcessor(unsigned int frame_size, unsigned int rat
       frames_to_collect_(frames_to_process),
       input_buffer_(nullptr),
       output_buffer_(nullptr),
-      frame_buffer_(static_cast<size_t>(frame_size) * frames_to_process),
+      frame_buffer_(static_cast<size_t>(frame_size) * frames_to_process), // Changed to hold the correct number of samples
       buffer_position_(0),
       frames_collected_(0) {
 }
@@ -141,6 +141,10 @@ auto GuitarFFTProcessor::Initialize() -> bool {
 
 // Process the collected frames
 void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
+    if (buf.size() != frame_buffer_.size()) {
+      std::cerr << "Error: Input buffer size mismatch. Expected " << frame_buffer_.size() << ", got " << buf.size() << std::endl;
+      return; // Important: Return to prevent out-of-bounds access.
+    }
     frame_buffer_ = std::move(buf);
     // Copy data to FFTW input buffer with conversion to float and windowing
     for (unsigned int i = 0; i < fft_size_; i++) {
