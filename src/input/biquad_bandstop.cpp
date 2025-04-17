@@ -22,10 +22,10 @@ void BiquadBandstop::config(double f_0, double f_s, double Q_factor)
 }
 auto BiquadBandstop::process(int16_t new_input) -> int16_t {
     // Convert input to float
-    double in = static_cast<double>(input);
-    double out = a0 * in + z1;
-    z1 = a1 * in + z2 - b1 * out;
-    z2 = a2 * in - b2 * out;
+    auto input = static_cast<double>(new_input);
+    double out = a0 * input + z1;
+    z1 = a1 * input + z2 - b1 * out;
+    z2 = a2 * input - b2 * out;
 
 
   // Clip result to int16_t range
