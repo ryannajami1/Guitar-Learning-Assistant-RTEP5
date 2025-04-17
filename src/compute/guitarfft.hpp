@@ -49,9 +49,9 @@ private:
     void AddFrame(std::array<int16_t, FRAMES> &frame);
     void ProcessFrames(std::vector<int16_t> buf);
     [[nodiscard]] auto GetFrequencyPeaks() const -> std::vector<std::pair<float, float>>;
-    void WriteFrequencyDataToFile(const std::string &filename);
-    void PrintFrequencyPeaks();
+    static void WriteFrequencyDataToFile(const std::string &filename);
+    static void PrintFrequencyPeaks();
     [[nodiscard]] auto GetFramesCollected() const -> unsigned int;
     [[nodiscard]] auto GetFramesNeeded() const -> unsigned int;
-    void Cleanup();
+    static void Cleanup();
 };
