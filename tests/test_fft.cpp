@@ -6,8 +6,16 @@
 #include <iostream>
 #include <vector>
 
+// Define a mock for the websocket function to avoid linking errors
+// This will replace the actual LWS_SendMessage function during testing
+extern "C" {
+    void LWS_SendMessage(const std::string& message) {
+        std::cout << "MOCK: Would send websocket message: " << message << std::endl;
+    }
+}
+
 // Function to generate a sine wave at a specific frequency
-// Single sine wave as if an individual string was plucked
+// As if a sinlge string was played
 static void GenerateSineWave(std::vector<int16_t> &buffer,
                              float frequency, float amplitude,
                              float sample_rate) {
@@ -21,7 +29,7 @@ static void GenerateSineWave(std::vector<int16_t> &buffer,
 }
 
 // Function to generate a guitar chord (multiple frequencies)
-// Simulates the input of a full chord with more than one string played
+// Full chord with more than one string
 static void GenerateGuitarChord(std::vector<int16_t> &buffer,
                                 const std::vector<float> &frequencies,
                                 float amplitude, float sample_rate) {
@@ -37,20 +45,21 @@ static void GenerateGuitarChord(std::vector<int16_t> &buffer,
 
     // Sum into the main buffer
     for (size_t i = 0; i < buffer.size(); i++) {
-      // Scale down to avoid overflow
-      buffer[i] += temp_buffer[i];
+      // Fixed: Prevent integer overflow by using a temporary int32_t
+      int32_t sum = static_cast<int32_t>(buffer[i]) + static_cast<int32_t>(temp_buffer[i]);
+      // Clamp the value to int16_t range
+      buffer[i] = static_cast<int16_t>(std::min(static_cast<int32_t>(INT16_MAX), 
+                                     std::max(static_cast<int32_t>(INT16_MIN), sum)));
     }
   }
 }
 
 // Test function that checks if the detected frequencies match the expected ones
-// Confirms if the input signal correctly converts to the appropriate frequency
 static auto
 ValidateFrequencies(const std::vector<std::pair<float, float>> &detected_peaks,
                     const std::vector<float> &expected_frequencies,
                     float tolerance = 10.0F) -> bool {
   // Check that we detect at least one peak
-  // Finds the dominent frequency
   if (detected_peaks.empty()) {
     std::cerr << "No frequency peaks detected!" << std::endl;
     return false;
@@ -61,8 +70,6 @@ ValidateFrequencies(const std::vector<std::pair<float, float>> &detected_peaks,
     bool found = false;
 
     // Look for a matching peak within tolerance
-    // Tolerance accounts for likely sub-optimal tuning of the guitar
-    // This ensures that the frequency can be identified even if not exactly 100%
     for (const auto &peak : detected_peaks) {
       if (std::abs(peak.first - expected_freq) <= tolerance) {
         found = true;
@@ -89,9 +96,9 @@ auto main() -> int {
     const unsigned int FRAMES_TO_PROCESS = 4; // Number of frames to process at once
     
     // Sample rate
-    // Identical to guitarfft.cpp
     const float sample_rate = 2000.0F;
 
+    std::cout << "Initializing FFT processor..." << std::endl;
     // Initialize FFT processor
     GuitarFFTProcessor processor(FRAME_SIZE, static_cast<unsigned int>(sample_rate), FRAMES_TO_PROCESS);
     if (!processor.Initialize()) {
@@ -100,7 +107,6 @@ auto main() -> int {
     }
     
     // Simple E major chord (E, G#, B)
-    // Frequencies that match the chord
     std::vector<float> e_chord_frequencies = {
         82.41F,  // E2
         164.81F, // E3 (first harmonic)
@@ -110,24 +116,36 @@ auto main() -> int {
 
     std::cout << "Testing E major chord detection..." << std::endl;
     
-    // Create buffer for the simulated chord - size is now FRAME_SIZE * FRAMES_TO_PROCESS
-    const size_t total_samples = FRAME_SIZE * FRAMES_TO_PROCESS;
+    // Create buffer for the simulated chord
+    // Fixed: Use explicit cast to size_t to avoid implicit widening conversion warning
+    const size_t total_samples = static_cast<size_t>(FRAME_SIZE) * static_cast<size_t>(FRAMES_TO_PROCESS);
     std::vector<int16_t> buffer(total_samples);
     
     // Generate the chord data directly into the vector
+    std::cout << "Generating test chord..." << std::endl;
     GenerateGuitarChord(buffer, e_chord_frequencies, 16000.0F, sample_rate);
     
     // Process the buffer in one go
+    std::cout << "Processing audio frames..." << std::endl;
     processor.ProcessFrames(buffer);
     
     // Get the detected peaks
+    std::cout << "Getting frequency peaks..." << std::endl;
     auto detected_peaks = processor.GetFrequencyPeaks();
     
     // Validate the results
+    std::cout << "Validating results..." << std::endl;
     bool test_passed = ValidateFrequencies(detected_peaks, e_chord_frequencies);
     
     // Clean up
+    std::cout << "Cleaning up..." << std::endl;
     processor.Cleanup();
     
-    return test_passed ? 0 : 1;
+    if (test_passed) {
+        std::cout << "✓ Test PASSED: All expected frequencies were detected!" << std::endl;
+        return 0;
+    } else {
+        std::cerr << "✗ Test FAILED: Not all expected frequencies were detected." << std::endl;
+        return 1;
+    }
 }
