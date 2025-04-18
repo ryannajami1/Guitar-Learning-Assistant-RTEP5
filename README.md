@@ -26,6 +26,11 @@ Compile
 ```
 ./compile.sh
 ```
+OneTime Manual Web Hosting setup:
+<strong>  
+  Follow the instructions on [Hosting Angular App](https://github.com/ryannajami1/Guitar-Learning-Assistant-RTEP5/wiki/HostingWebAppUsingNginx)
+</strong>
+  
 Run the executable
 ```
 ./build/src/main
