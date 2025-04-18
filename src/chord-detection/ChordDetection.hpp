@@ -25,4 +25,19 @@ public:
                           const vector<float> &magnitudes) -> vector<float>;
 };
 
+
+/* If building the tests then declare these functions in the header so they are accessible.
+ * Otherwise they dont need to be accessible.
+*/
+#ifdef TEST_BUILD
+auto DeterminePeaks(const vector<float> &data, float threshold,
+  float min_height, float /*min_width*/) -> vector<size_t>;
+
+auto CalculateNoiseFloor(const vector<float> &data) -> float;
+
+auto NoteNumber(float frequency) -> int;
+
+auto NoteName(int note_num) -> string;
+#endif
+
 #endif
