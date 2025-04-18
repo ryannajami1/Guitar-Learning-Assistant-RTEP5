@@ -39,7 +39,7 @@ jobs:
       run: |
         chmod +x compile.sh
         ./compile.sh 2>&1 | tee output.log
-        if [grep -q "error" output.log || grep -q "Error" output.log ]; then
+        if [grep -q "error" output.log] || [grep -q "Error" output.log ]; then
           echo "::error::Build failed"
           exit 1
         else
@@ -73,7 +73,7 @@ jobs:
     - name: Check for warnings in the build log
       run: |
         cat output.log
-        if [grep -q "warning" output.log; || grep -q "Warning" output.log; ] then
+        if [grep -q "warning" output.log] || [grep -q "Warning" output.log]; then
           echo "::error::Warnings found in build log"
           exit 1
         else
