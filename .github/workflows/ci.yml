@@ -33,7 +33,7 @@ jobs:
       run: |
         chmod +x compile.sh
         ./compile.sh 2>&1 | tee output.log
-        
+
         if grep -q "error:" output.log; then
           echo "::error::Build failed due to errors in the build log" #Use of ::error::
           exit 1
@@ -102,4 +102,5 @@ jobs:
     - name: Run tests
       run: |
         chmod +x build/tests/*
-        ctest --test-dir ./build
+        chmod +x ./runtests.sh
+        ./runtests.sh

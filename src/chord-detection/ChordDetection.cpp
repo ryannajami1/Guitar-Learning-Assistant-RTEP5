@@ -1,17 +1,24 @@
-#include <cstdio>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <array>
-#include <cmath>
-#include <algorithm>
 #include "ChordDetection.hpp"
+#include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <iostream>
 #include <map>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::cout;
+using std::map;
+using std::unordered_map;
+using std::log2;
+using std::round;
+using std::sort;
+using std::unique;
+using std::find;
+using std::rotate;
 
 /* Terms used
 * ===========
@@ -25,83 +32,81 @@ using namespace std;
  * Note:    1, m2, M2, m3, M3,  4, a4,  5, m6, M6, m7, M7,  8
  * Steps:   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12
 */
-
-// 
 map<vector<int>, string> chord_interval_table = {
     // maj
     // Notes:       1-3-5-8
     // Intervals:    4,3,5
-    {{4,3,5}, "maj"},
-    {{5,4,3}, "maj 1stInv"},
-    {{3,5,4}, "maj 2ndInv"},
-    {{4,3,5}, "maj"},
-    {{2,2,3,5}, "maj"},
+    {{4, 3, 5}, "maj"},
+    {{5, 4, 3}, "maj 1stInv"},
+    {{3, 5, 4}, "maj 2ndInv"},
+    {{4, 3, 5}, "maj"},
+    {{2, 2, 3, 5}, "maj"},
     // min
     // Notes:       1-m3-5-8
     // Intervals:    3,4,5
-    {{3,4,5}, "min"},
-    {{5,3,4}, "min 1stInv"},
-    {{4,5,3}, "min 2ndInv"},
-    {{2,1,4,5}, "min"},
+    {{3, 4, 5}, "min"},
+    {{5, 3, 4}, "min 1stInv"},
+    {{4, 5, 3}, "min 2ndInv"},
+    {{2, 1, 4, 5}, "min"},
     //{{2,1,4,3,2} "min"},
     // Diminished
     // Notes:       1-m3-m5-8
     // Intervals:    3,3,6
-    {{3,3,6}, "dim"},
+    {{3, 3, 6}, "dim"},
     // Augmented
     // Notes:       1-3-#5(m6)-8
     // Intervals:    4,4,4
-    {{4,4,4}, "aug"},
+    {{4, 4, 4}, "aug"},
     // Sus2
     // Notes:       1-2-5-8
     // Intervals:    2,5,5
-    {{2,5,5}, "sus2"},
+    {{2, 5, 5}, "sus2"},
     // Sus4
     // Notes:       1-4-5-8
     // Intervals:    5,2,5
-    {{5,2,5}, "sus4"},
+    {{5, 2, 5}, "sus4"},
     // Dominant 7
     // Notes:       1-3-5-m7-8
     // Intervals:    4,3,3,2
-    {{4,3,3,2}, "7"},
-    {{2,2,1,2,3,2}, "7"},
-    {{2,2,1,2,3,1,1}, "7"},
-    {{4,1,2,3,2}, "7"},
+    {{4, 3, 3, 2}, "7"},
+    {{2, 2, 1, 2, 3, 2}, "7"},
+    {{2, 2, 1, 2, 3, 1, 1}, "7"},
+    {{4, 1, 2, 3, 2}, "7"},
     // maj 7
     // Notes:       1-3-5-7-8
     // Intervals:    4,3,4,1
-    {{4,3,4,1}, "maj7"},
-    {{4,2,1,4,1}, "maj7"},
-    {{2,2,2,1,4,1}, "maj7"},
+    {{4, 3, 4, 1}, "maj7"},
+    {{4, 2, 1, 4, 1}, "maj7"},
+    {{2, 2, 2, 1, 4, 1}, "maj7"},
     // min 7
     // Notes:       1-m3-5-m7-8
     // Intervals:    3, 4,3, 2
-    {{3,4,3,2}, "min7"},
-    {{2,1,2,2,3,2}, "min7"},
+    {{3, 4, 3, 2}, "min7"},
+    {{2, 1, 2, 2, 3, 2}, "min7"},
     // maj 6
     // Notes:       1-3-5-6-8
     // Intervals:    4,3,2,3
-    {{4,3,2,3}, "maj6"},
+    {{4, 3, 2, 3}, "maj6"},
     // min 6
-    // Notes:       1-m3-5-m6-8
-    // Intervals:    3, 4,1, 4
-    {{3,4,1,4}, "min6"}
+    // Notes:       1-m3-5-6-8
+    // Intervals:    3, 4,2, 3
+    {{3, 4, 2, 3}, "min6"}
 
 };
 
 // Peak detection algorithm
 auto DeterminePeaks(const vector<float> &data, float threshold,
-                                    float min_height, float /*min_width*/)
-    -> vector<int> {
+                           float min_height, float /*min_width*/)
+    -> vector<size_t> {
 
   float mask_top = data[0];
   float mask_bottom = mask_top - min_height;
 
   float highest = data[0];
-  int highest_index = 0;
+  size_t highest_index = 0;
   float lowest = data[0];
 
-  vector<int> peak_indices;
+  vector<size_t> peak_indices;
 
   ChordDetection::State state = ChordDetection::kUnknown;
 
@@ -144,10 +149,10 @@ auto DeterminePeaks(const vector<float> &data, float threshold,
 // Calculates the average value in a vector of floats
 auto CalculateNoiseFloor(const vector<float> &data) -> float {
   float sum = 0.0;
-  for (float value : data) {
+  for (float const value : data) {
     sum += value;
   }
-  return sum / data.size();
+  return sum / static_cast<float>(data.size());
 }
 
 // Gets the peak frequencies from fft data
@@ -155,17 +160,18 @@ auto ChordDetection::GetPeakFrequencies(vector<float> frequencies,
                                         const vector<float> &magnitudes)
     -> vector<float> {
   // Calculate the noise floor to adjust the threshold
-  float noise_floor = CalculateNoiseFloor(magnitudes);
-  float threshold = noise_floor * 30;
+  float const noise_floor = CalculateNoiseFloor(magnitudes);
+  float const threshold = noise_floor * 30;
 
   // Run peak detection function
-  std::vector<int> peak_indexes = DeterminePeaks(magnitudes, threshold, 0.5, 1);
+  std::vector<size_t> const peak_indexes =
+      DeterminePeaks(magnitudes, threshold, 0.5, 1);
 
   // Get frequencies of peaks
   std::vector<float> peak_frequencies;
-  for (int peak_index : peak_indexes) {
+  for (size_t const peak_index : peak_indexes) {
     // Make sure freq is within bounds
-    float freq = frequencies[peak_index];
+    float const freq = frequencies[peak_index];
     if (freq > 15) {
       peak_frequencies.push_back(frequencies[peak_index]);
     }
@@ -184,12 +190,13 @@ auto NoteName(int note_num) -> string {
   if (note_index < 0) {
     note_index += 12;
   }
+
   return notes[note_index];
 }
 
 // Converts frequency to note number
 auto NoteNumber(float frequency) -> int {
-  int note_number = static_cast<int>(round(12 * log2(frequency / 440.0)));
+  int const note_number = static_cast<int>(round(12 * log2(frequency / 440.0)));
   return note_number;
 }
 
@@ -197,27 +204,28 @@ auto NoteNumber(float frequency) -> int {
 auto NotesSetToChordType(vector<int> notes_set) -> string {
   // Print notes_set for debugging
   cout << "Notes set: ";
-  for (int note : notes_set) {
+  for (int const note : notes_set) {
     cout << note << " ";
   }
-  cout << endl;
+  cout << '\n';
 
   // Get the intervals between each note.
   vector<int> intervals;
-  int len = notes_set.size();
+  size_t const len = notes_set.size();
   for (size_t i = 1; i <= len; i++) {
     int interval = notes_set[i % len] - notes_set[i - 1];
-    if (interval < 0)
+    if (interval < 0) {
       interval += 12;
+    }
     intervals.push_back(interval);
   }
 
   // Print intervals for debugging
   cout << "Intervals: ";
-  for (int interval : intervals) {
+  for (int const interval : intervals) {
     cout << interval << " ";
   }
-  cout << endl;
+  cout << '\n';
 
   // match the chord type
   return chord_interval_table[intervals];
@@ -227,12 +235,12 @@ auto NotesSetToChordType(vector<int> notes_set) -> string {
 auto RemoveNonDuplicates(const vector<int> &vec) -> vector<int> {
   unordered_map<int, int> num_occurences;
 
-  for (int num : vec) {
+  for (int const num : vec) {
     num_occurences[num]++;
   }
 
   vector<int> new_vector;
-  for (int num : vec) {
+  for (int const num : vec) {
     if (num_occurences[num] > 1) {
       new_vector.push_back(num);
     }
@@ -259,21 +267,22 @@ auto ChordDetection::ChordLookup(const vector<float> &frequencies) -> string {
   // Get the note numbers from the peak freqeuncies
   std::vector<int> notes;
   notes.reserve(frequencies.size());
-  for (float freq : frequencies) {
+  for (float const freq : frequencies) {
     notes.push_back(NoteNumber(freq));
   }
 
   // Remove duplicates where a note was detected in the same octave twice
   notes.erase(unique(notes.begin(), notes.end()), notes.end());
   std::cout << "-----------------\nNotes going into algo\n------------------\n";
-  for (int note : notes) {
-    std::cout << "Number: " << note << " Note: " << NoteName(note) << std::endl;
+  for (int const note : notes) {
+    std::cout << "Number: " << note << " Note: " << NoteName(note) << '\n';
   }
 
   // Find the root note
   int root = notes[0] % 12;
-  if (root < 0)
+  if (root < 0) {
     root += 12;
+  }
 
   // Strip ocatve information from notes
   vector<int> octaveless_notes = notes;
@@ -341,7 +350,7 @@ auto ChordDetection::ChordLookup(const vector<float> &frequencies) -> string {
     root %= 12;
   }
 
-  string root_note = NoteName(root);
+  string const root_note = NoteName(root);
   string chord_name = root_note + " " + chord_type;
   return chord_name;
 }

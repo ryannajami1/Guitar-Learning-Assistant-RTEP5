@@ -1,12 +1,13 @@
 #ifndef AUDIO_INPUT_HPP
 #define AUDIO_INPUT_HPP
 
+#include "biquad_bandstop.hpp"
 #include <alsa/asoundlib.h>
 #include <array>
-#include <vector>
-#include <functional>
+#include <cstddef>
 #include <cstdint>
-#include "biquad_bandstop.hpp"
+#include <functional>
+#include <vector>
 
 constexpr size_t sample_array_size = 128;
 

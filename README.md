@@ -1,5 +1,6 @@
 # Guitar-Learning-Assistant-RTEP5
-![image](https://github.com/user-attachments/assets/e07a5550-07ae-4ea3-8d5d-35c13ffcd222)
+![434292581-3aa7b650-dfe2-41c4-b1cc-b38c2a8b0672](https://github.com/user-attachments/assets/c2dda934-bd13-4ddb-9ca5-312394a84ffa)
+
 
 This repository is for the development of a real-time learning assistant used to help beginner guitarists practice. 
 
@@ -15,28 +16,17 @@ The device has to react to the signal received from the guitar, and determine if
 For more infromation on the project such as hardware and software, social media links, and developer tips please check out our WIKI:
 https://github.com/ryannajami1/Guitar-Learning-Assistant-RTEP5/wiki
 
-## Setup instructions
-### 1. Install WSL (Windows only)
-Go to the microsoft store and search for WSL or Ubuntu and install Ubuntu
-![alt text](images/Ubuntu.png)
+# Quick Software Guide
+Install updates and dependencies (-y say yes to all pop-ups)
 
-An instance of WSL can be opened by searching and running Ubuntu from the windows search bar, or by typing wsl is cmd or powershell.
-
-On opening for the first time there will be some setup - it asks you to setup an account and create a user password iirc but thats pretty much it.
-
-This link provides more information on installing WSL https://learn.microsoft.com/en-us/windows/wsl/install
-### 2. Install dependencies
-Run the following commands in wsl to install the correct dependencies:
+```sh
+./init.sh -y
 ```
-sudo apt update
-sudo apt upgrade
-sudo apt-get install clang
-sudo apt-get install gcc
-sudo apt-get install gdb
-sudo apt-get install clang-tidy
+Compile
 ```
-### 3. Build the repository
-After cloning the repo it can be built by running build.sh
+./compile.sh
 ```
-./build.sh
+Run the executable
+```
+./build/src/main
 ```
