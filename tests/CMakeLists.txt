@@ -18,6 +18,10 @@ find_package(ALSA REQUIRED)
 
 set(libwebsockets_lib "/usr/lib/aarch64-linux-gnu/libwebsockets.so.17")
 
+if(NOT EXISTS libwebsockets_lib)
+    set(libwebsockets_lib "/usr/lib/x86_64-linux-gnu/libwebsockets.so.17")
+endif()
+
 add_executable(test_fft test_fft.cpp)
 target_include_directories(test_fft PRIVATE ${CMAKE_SOURCE_DIR}/src/compute)
 target_link_libraries(test_fft guitarfft audio_input asound pthread ${FFTW_LIB} websocket ${libwebsockets_lib} -lm)

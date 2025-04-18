@@ -29,6 +29,12 @@ jobs:
           libasound2-dev \
           build-essential
 
+    - name: Find libwebsockets path
+      id: find_lws
+      run: |
+        LWS_PATH=$(find /usr/lib* -name "libwebsockets.so*" | head -n 1)
+        echo "LWS_PATH=$LWS_PATH"
+
     - name: Build
       run: |
         chmod +x compile.sh
