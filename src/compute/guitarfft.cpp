@@ -101,8 +101,7 @@ void GuitarFFTProcessor::FindFrequencyPeaks(float threshold_percent,
 // Constructor
 GuitarFFTProcessor::GuitarFFTProcessor(unsigned int frame_size, unsigned int rate, unsigned int frames_to_process)
     : fft_size_(frame_size * frames_to_process), 
-      sample_rate_(rate),
-      samples_per_frame_(frame_size), 
+      sample_rate_(rate), 
       frames_to_collect_(frames_to_process),
       input_buffer_(nullptr),
       output_buffer_(nullptr),

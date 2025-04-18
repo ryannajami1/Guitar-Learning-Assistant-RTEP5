@@ -13,7 +13,6 @@ class GuitarFFTProcessor {
 private:
     unsigned int fft_size_;
     unsigned int sample_rate_;
-    unsigned int samples_per_frame_;
     unsigned int frames_to_collect_;
 
     fftwf_plan fft_plan_;
