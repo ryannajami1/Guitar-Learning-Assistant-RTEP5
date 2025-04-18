@@ -32,9 +32,7 @@ using std::rotate;
  * Note:    1, m2, M2, m3, M3,  4, a4,  5, m6, M6, m7, M7,  8
  * Steps:   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12
 */
-
-//
-static map<vector<int>, string> chord_interval_table = {
+map<vector<int>, string> chord_interval_table = {
     // maj
     // Notes:       1-3-5-8
     // Intervals:    4,3,5
@@ -90,14 +88,14 @@ static map<vector<int>, string> chord_interval_table = {
     // Intervals:    4,3,2,3
     {{4, 3, 2, 3}, "maj6"},
     // min 6
-    // Notes:       1-m3-5-m6-8
-    // Intervals:    3, 4,1, 4
-    {{3, 4, 1, 4}, "min6"}
+    // Notes:       1-m3-5-6-8
+    // Intervals:    3, 4,2, 3
+    {{3, 4, 2, 3}, "min6"}
 
 };
 
 // Peak detection algorithm
-static auto DeterminePeaks(const vector<float> &data, float threshold,
+auto DeterminePeaks(const vector<float> &data, float threshold,
                            float min_height, float /*min_width*/)
     -> vector<size_t> {
 
@@ -149,7 +147,7 @@ static auto DeterminePeaks(const vector<float> &data, float threshold,
 }
 
 // Calculates the average value in a vector of floats
-static auto CalculateNoiseFloor(const vector<float> &data) -> float {
+auto CalculateNoiseFloor(const vector<float> &data) -> float {
   float sum = 0.0;
   for (float const value : data) {
     sum += value;
@@ -183,7 +181,7 @@ auto ChordDetection::GetPeakFrequencies(vector<float> frequencies,
 }
 
 // Converts note number to note name
-static auto NoteName(int note_num) -> string {
+auto NoteName(int note_num) -> string {
   vector<string> notes = {"A",  "A#", "B", "C",  "C#", "D",
                           "D#", "E",  "F", "F#", "G",  "G#"};
 
@@ -192,17 +190,18 @@ static auto NoteName(int note_num) -> string {
   if (note_index < 0) {
     note_index += 12;
   }
+
   return notes[note_index];
 }
 
 // Converts frequency to note number
-static auto NoteNumber(float frequency) -> int {
+auto NoteNumber(float frequency) -> int {
   int const note_number = static_cast<int>(round(12 * log2(frequency / 440.0)));
   return note_number;
 }
 
 // Gets the chord type from a given set of notes
-static auto NotesSetToChordType(vector<int> notes_set) -> string {
+auto NotesSetToChordType(vector<int> notes_set) -> string {
   // Print notes_set for debugging
   cout << "Notes set: ";
   for (int const note : notes_set) {
@@ -233,7 +232,7 @@ static auto NotesSetToChordType(vector<int> notes_set) -> string {
 }
 
 // Remove any items in a list tha only appear once
-static auto RemoveNonDuplicates(const vector<int> &vec) -> vector<int> {
+auto RemoveNonDuplicates(const vector<int> &vec) -> vector<int> {
   unordered_map<int, int> num_occurences;
 
   for (int const num : vec) {
