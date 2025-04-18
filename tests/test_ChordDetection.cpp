@@ -22,7 +22,7 @@ static auto test_determine_peaks() -> int {
   vector<float> wave(100);
 
   for (size_t i = 0; i < 100; i++) {
-    wave[i] = sinf(i * 3.141592f / 20);
+    wave[i] = sinf(static_cast<float>(i) * 3.141592F / 20.F);
   }
 
   // Run function
