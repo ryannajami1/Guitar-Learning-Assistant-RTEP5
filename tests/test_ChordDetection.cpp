@@ -11,8 +11,6 @@
 using namespace std;
 
 static auto test_determine_peaks() -> int {
-  ChordDetection const cd;
-
   // Test the peak detection
 
   // Generate sin wave data
@@ -23,10 +21,10 @@ static auto test_determine_peaks() -> int {
   }
 
   // Run function
-  vector<int> peaks = cd.determine_peaks(wave, 0.5, 0.5, 0);
+  vector<size_t> peaks = DeterminePeaks(wave, 0.5, 0.5, 0);
 
   // Check indexes are correct
-  for (int index : peaks) {
+  for (size_t index : peaks) {
     if ((index + 10) % 20 != 0) {
       cout << "Incorrect peak detected. Test failed.\n";
       cout << "Index: " << index << "\n";
@@ -40,8 +38,6 @@ static auto test_determine_peaks() -> int {
 }
 
 static auto test_note_lookup() -> int {
-  ChordDetection const cd;
-
   // Test the note lookup
   // ------------------------------------------------------------------------------------------
 
@@ -75,7 +71,7 @@ static auto test_note_lookup() -> int {
       {"G#", 6644.88}, {"A", 7040.00},  {"A#", 7458.62}, {"B", 7902.13}};
 
   for (const auto &note : noteFrequencies) {
-    string note_name = cd.NoteName(cd.NoteNumber(note.second));
+    string note_name = NoteName(NoteNumber(note.second));
     if (note_name != note.first) {
       cout << note.first << " | " << note_name;
       cerr << "Note Lookup failed :(((\n";
@@ -90,10 +86,9 @@ static auto test_note_lookup() -> int {
 
 static auto test_fft_data() -> int {
 
-  ChordDetection const cd;
-
   // Read FFT data from CSV file
-  ifstream file("../../tests/fft-data/scope_4_fft.csv");
+  string csv_path = string(ROOT_DIR) + "/tests/fft-data/scope_4_fft.csv";
+  ifstream file(csv_path);
   if (!file.is_open()) {
     cerr << "Failed to open FFT data file.\n";
     return 1;
@@ -125,20 +120,18 @@ static auto test_fft_data() -> int {
   vector<float> fft_magnitude;
   for (vector<float> row : fft_data) {
     fft_magnitude.push_back(row[1]);
-    cout << row[1] << "\n";
   }
 
   // Find the noise floor
-  float noise_floor = cd.CalculateNoiseFloor(fft_magnitude);
+  float noise_floor = CalculateNoiseFloor(fft_magnitude);
   float threshold = noise_floor * 30;
-  cout << "threshold " << threshold << "\n";
 
   // Run FFT processing function
-  vector<int> peaks = cd.determine_peaks(fft_magnitude, threshold, 0.1, 0);
+  vector<size_t> peaks = DeterminePeaks(fft_magnitude, threshold, 0.1, 0);
 
   // Get frequencies of peaks
-  vector<float> const frequencies;
-  for (int peak_index : peaks) {
+  vector<float> frequencies;
+  for (size_t peak_index : peaks) {
     float f = fft_data[peak_index][0];
     cout << f << "\n";
     frequencies.push_back(fft_data[peak_index][0]);
@@ -180,34 +173,31 @@ static auto test_chord_lookup() -> int {
       {"E8", 5274.04},  {"F8", 5587.65},  {"F#8", 5919.91}, {"G8", 6271.93},
       {"G#8", 6644.88}, {"A8", 7040.00},  {"A#8", 7458.62}, {"B8", 7902.13}};
 
-  ChordDetection const cd;
-
   vector<pair<string, vector<string>>> const chord_test_data = {
       // Triads -----------------------------------
-      {"E Major", {"E2", "B2", "E3", "G#3", "B3", "E4"}},
-      {"D Minor", {"D4", "A4", "D5", "F5"}},
-      {"A Sus2", {"A3", "E4", "A4", "B4", "E5"}},
-      {"A Sus4", {"A3", "E4", "A4", "D5", "E5"}},
-      {"G Augmented", {"G2", "B2", "D#3", "G3"}},
-      {"F Diminished", {"F3", "B3", "F4", "G#4"}},
+      {"E maj", {"E2", "B2", "E3", "G#3", "B3", "E4"}},
+      {"D min", {"D4", "A4", "D5", "F5"}},
+      {"A sus2", {"A3", "E4", "A4", "B4", "E5"}},
+      {"A sus4", {"A3", "E4", "A4", "D5", "E5"}},
+      {"G aug", {"G2", "B2", "D#3", "G3"}},
+      {"F dim", {"F3", "B3", "F4", "G#4"}},
       // 4 Note Chords ---------------------------
       {"C 7", {"C3", "G3", "C4", "E4", "A#4"}},
-      {"C Major 7", {"C3", "G3", "C4", "E4", "B4"}},
-      {"C Minor 7", {"C3", "G3", "C4", "D#4", "A#4"}},
-      {"F Major 6", {"F3", "C4", "A4", "D4"}},
-      {"F Minor 6", {"F3", "C4", "G#4", "D4"}}};
+      {"C maj7", {"C3", "G3", "C4", "E4", "B4"}},
+      {"C min7", {"C3", "G3", "C4", "D#4", "A#4"}},
+      {"F maj6", {"F3", "C4", "A4", "D4"}},
+      {"F min6", {"F3", "C4", "G#4", "D4"}}};
 
   bool passed = true;
 
-  for (const pair &const chord : chord_test_data) {
-
-    vector<int> note_numbers;
-    for (const string &const note : chord.second) {
+  for (const pair<string, vector<string>> &chord : chord_test_data) {
+    vector<float> frequencies;
+    for (const string &note : chord.second) {
       float frequency = noteFrequencies[note];
-      note_numbers.push_back(cd.NoteNumber(frequency));
+      frequencies.push_back(frequency);
     }
 
-    string chord_name = ChordDetection::ChordLookup(note_numbers);
+    string chord_name = ChordDetection::ChordLookup(frequencies);
 
     string result = "passed :)";
 
@@ -232,11 +222,11 @@ static auto test_chord_lookup() -> int {
 
 auto main(int, char**) -> int {
 
-    // if (test_determine_peaks()) return 1;
-    // if (test_note_lookup()) return 1;
-    // if (test_fft_data()) return 1;
+    if (test_determine_peaks()) return 1;
+    if (test_note_lookup()) return 1;
+    if (test_fft_data()) return 1;
     if (test_chord_lookup() != 0)
       return 1;
 
-    return 0;
+  return 0;
 }

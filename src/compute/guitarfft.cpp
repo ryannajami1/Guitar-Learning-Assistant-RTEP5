@@ -171,9 +171,9 @@ void GuitarFFTProcessor::ProcessFrames(std::vector<int16_t> buf) {
   }
 
   // Get the peak frequencies from the FFT data
-    std::vector<float> peak_frequencies = ChordDetection::GetPeakFrequencies(fft_freqs, fft_mags);
+  std::vector<float> peak_frequencies = ChordDetection::GetPeakFrequencies(fft_freqs, fft_mags);
 
-    // Get the chord name from the peak frequencies
+  // Get the chord name from the peak frequencies
   std::string chord_name = ChordDetection::ChordLookup(peak_frequencies);
 
   std::cout << chord_name << std::endl;
