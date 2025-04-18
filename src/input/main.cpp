@@ -7,22 +7,21 @@
 #include <cstdint>
 #include <iostream>
 
-AudioInput in;
+AudioInput audio_in;
 
-void callback(std::vector<int16_t>& sample_buffer)
-{
-    std::cerr << "Chord detected" << std::endl;
+void Callback(std::vector<int16_t> &sample_buffer) {
+  std::cerr << "Chord detected" << std::endl;
 
-    for (const auto& val : sample_buffer) {
-        std::cout << val << std::endl;
-    }
+  for (const auto &val : sample_buffer) {
+    std::cout << val << std::endl;
+  }
 }
 
-int main() {    
-    std::cerr << "Chord test" <<std::endl;
+auto main() -> int {
+  std::cerr << "Chord test" << std::endl;
 
-    in.register_callback(callback);
-    in.init();
-    in.start_loop();
-    in.close();
+  audio_in.register_callback(Callback);
+  audio_in.init();
+  audio_in.start_loop();
+  audio_in.close();
 }

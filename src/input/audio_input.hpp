@@ -28,7 +28,7 @@ private:
     snd_pcm_hw_params_t* params; // pointer to audio stream parameters
     snd_pcm_uframes_t frames; // number of frames per period
 
-    int size; // size of each frame in bytes
+    snd_pcm_uframes_t size; // size of each frame in bytes
     int16_t* buffer; // buffer to store single frame
 
     std::array<int16_t, sample_array_size> sample_array;
@@ -39,7 +39,7 @@ private:
     bool done = false;
     bool recording = false;
     int periods_recorded = 0;
-    int num_periods = 64; // number of periods to record in a buffer
+    int num_periods = 32; // number of periods to record in a buffer
 
     const int saturation_threshold = 32767;
     const int chord_threshold = 800;
