@@ -27,18 +27,19 @@ jobs:
           libwebsockets-dev \
           libfftw3-dev \
           libasound2-dev \
-          build-essential 
+          build-essential
 
     - name: Build
       run: |
         chmod +x compile.sh
         ./compile.sh 2>&1 | tee output.log
-
-        if grep -q "error:" output.log; then
-          echo "::error::Build failed due to errors in the build log" #Use of ::error::
+        BUILD_STATUS=$? # Capture the exit code
+        cat output.log # Print the log for debugging
+        if [ $BUILD_STATUS -ne 0 ]; then
+          echo "::error::Build failed with exit code $BUILD_STATUS"
           exit 1
         else
-          echo "Build completed without errors."
+          echo "Build completed successfully."
         fi
 
     - name: Upload build artifacts
@@ -70,18 +71,16 @@ jobs:
         cat output.log
         ! grep -q "warning:" output.log
 
-
   test:
     runs-on: ubuntu-latest
     container: debian:bookworm
     needs: build
-    continue-on-error: true
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install test dependencies (if different or needed again)
+    - name: Install test dependencies
       run: |
         apt-get update -y
         apt-get install -y --no-install-recommends \
@@ -91,7 +90,7 @@ jobs:
           libwebsockets-dev \
           libfftw3-dev \
           libasound2-dev \
-          build-essential # Install make for tests too
+          build-essential
 
     - name: Download build artifacts
       uses: actions/download-artifact@v4
@@ -99,8 +98,12 @@ jobs:
         name: build
         path: build/
 
+    - name: List build directory contents
+      run: |
+        ls -lR build/ # Add this to see the file structure
+        ls -la .
+
     - name: Run tests
       run: |
         chmod +x build/tests/*
-        chmod +x ./runtests.sh
         ./runtests.sh
