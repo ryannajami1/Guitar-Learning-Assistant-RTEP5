@@ -6,17 +6,21 @@ import {Observable, Subject} from 'rxjs';
 })
 export class WsService {
 
-  SOCKET_URL: string = "ws://192.168.1.73:9000" ; // TODO:  MOVE THIS TO ENVIRONMENT
+  socketUrl: string = "" ;
+
   private websocket: WebSocket;
   private messages: Subject<any> = new Subject();
 
   constructor() {
-    this.websocket = new WebSocket(this.SOCKET_URL);
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const hostname = window.location.hostname;
+    this.socketUrl = `${protocol}://${hostname}:9000`
+    this.websocket = new WebSocket(this.socketUrl);
     this.connect();
   }
 
   connect() {
-    console.log("CONNECT")
+    console.log("CONNECT @ " + this.socketUrl);
 
     this.websocket.onopen = (event) => {
       console.log('WebSocket connection established!');
