@@ -20,6 +20,6 @@ set(libwebsockets_lib "/usr/lib/aarch64-linux-gnu/libwebsockets.so.17")
 
 add_executable(test_fft test_fft.cpp)
 target_include_directories(test_fft PRIVATE ${CMAKE_SOURCE_DIR}/src/compute)
-target_link_libraries(test_fft guitarfft audio_input asound pthread ${FFTW_LIB} ${libwebsockets_lib} -lm)
+target_link_libraries(test_fft guitarfft audio_input asound pthread ${FFTW_LIB} websocket ${libwebsockets_lib} -lm)
 add_test(TestFFT test_fft)
 
