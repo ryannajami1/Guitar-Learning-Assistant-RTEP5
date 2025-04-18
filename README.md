@@ -28,9 +28,15 @@ Compile
 ```
 OneTime Manual Web Hosting setup:
 <strong>  
-  Follow the instructions on [Hosting Angular App](https://github.com/ryannajami1/Guitar-Learning-Assistant-RTEP5/wiki/HostingWebAppUsingNginx)
+  Follow the instructions for [Hosting Angular App](https://github.com/ryannajami1/Guitar-Learning-Assistant-RTEP5/wiki/HostingWebAppUsingNginx)
 </strong>
-  
+
+
+OneTime Alsa Driver setup:
+<strong>  
+  Follow the instructions for [ALSA Setup](https://github.com/ryannajami1/Guitar-Learning-Assistant-RTEP5/wiki/Environment-and-Hardware-Setup)
+</strong>
+
 Run the executable
 ```
 ./build/src/main
