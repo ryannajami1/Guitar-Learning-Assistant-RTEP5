@@ -46,5 +46,5 @@ https://github.com/ryannajami1/Guitar-Learning-Assistant-RTEP5/wiki
 
 ## Run the executable
 ```
-./build/src/main
+exec bash
 ```

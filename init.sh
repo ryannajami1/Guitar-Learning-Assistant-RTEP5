@@ -36,4 +36,10 @@ run_apt apt install libwebsockets-dev
 run_apt apt install libfftw3-dev
 run_apt apt install libasound2-dev
 
+BASHRC_LINES="sudo alsactl restore -f ~/Guitar-Learning-Assistant-RTEP5/alsa_config
+hostname -I
+~/Guitar-Learning-Assistant-RTEP5/build/src/main"
+
+echo "$BASHRC_LINES" >> ~/.bashrc
+
 echo "Init of Enviroment completed."
