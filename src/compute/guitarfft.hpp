@@ -20,7 +20,7 @@ private:
     float *input_buffer_;
     fftwf_complex *output_buffer_;
 
-    std::vector<short> frame_buffer_;
+    std::vector<int16_t> frame_buffer_;  
     unsigned int buffer_position_;
     unsigned int frames_collected_;
 
@@ -46,7 +46,7 @@ private:
     ~GuitarFFTProcessor();
 
     auto Initialize() -> bool;
-    void AddFrame(std::array<int16_t, FRAMES> &frame);
+    
     void ProcessFrames(std::vector<int16_t> buf);
     std::vector<std::pair<float, float>> GetFrequencyPeaks() const;
     void WriteFrequencyDataToFile(const std::string &filename);
