@@ -12,7 +12,6 @@ import {CorrectChordComponent} from '../../../widgets/correct-chord/correct-chor
 import {WrongChordComponent} from '../../../widgets/wrong-chord/wrong-chord.component';
 import {TimeoutComponent} from '../../../widgets/timeout/timeout.component';
 import {ChordsService} from '../../../../services/chords.service';
-import {EChordStatus} from '../../../../models/chord-status.enum';
 import {WsService} from '../../../../services/ws.service';
 import {InputNumberModule} from 'primeng/inputnumber';
 
@@ -24,8 +23,6 @@ import {InputNumberModule} from 'primeng/inputnumber';
   styleUrl: './desktop-practice.component.scss'
 })
 export class DesktopPracticeComponent {
-  EChordStatus = EChordStatus;
-
   showChord: boolean = true;
   showSettings: boolean = false;
 
@@ -36,26 +33,11 @@ export class DesktopPracticeComponent {
 
 
   messages: any[] = [];
-  newMessage: string = 'TEST';
 
   ngOnInit() {
     this.wsService.getMessages().subscribe((message) => {
       this.messages.push(message);
     });
-  }
-
-  sendMessage() {
-    if (this.newMessage.trim()) {
-      console.log('SEND MESSAGE')
-      this.wsService.sendMessage({chord: "A min"});
-      // this.newMessage = '';
-    }
-  }
-
-  getMessage() {
-    this.wsService.getMessages().subscribe((event) => {
-      console.log(event);
-    })
   }
 
 
@@ -66,7 +48,6 @@ export class DesktopPracticeComponent {
 
   onSettingsClose(event: any): void {
     sessionStorage.setItem('chordGenerationSettings', JSON.stringify(this.chordPlayedService.chordGenerationSettings));
-
     this.chordPlayedService.getNewCurrentChord();
   }
 }

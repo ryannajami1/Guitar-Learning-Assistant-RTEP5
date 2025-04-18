@@ -45,8 +45,6 @@ export class ChordsService {
 
   handleWsMessage(message: any): void {
     this.wsChordReceived = true;
-    console.log(this.currentChordToBePlayed);
-    console.log(message); // TODO: CHANGE TO JSON OBJECT
     this.wsLastChordReceived = message;
     if (this.wsLastChordReceived == this.currentChordToBePlayed) {
       this.chordEventHandler(EChordStatus.Correct)
@@ -90,6 +88,11 @@ export class ChordsService {
   }
 
   chordEventHandler(status: EChordStatus): void {
+    if (this.showTimeoutModal || this.showCorrectChordModal || this.showWrongChordModal) {
+      return;
+    }
+
+
     this.timerStop();
     this.lastResponseTimes.push(this.timerStartValueMs - this.timerCurrentValueMs);
 
