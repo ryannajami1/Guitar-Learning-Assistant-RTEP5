@@ -8,16 +8,21 @@
 #include <utility>
 #include <vector>
 
-using namespace std;
+using std::vector;
+using std::map;
+using std::string;
+using std::ifstream;
+using std::stringstream;
+using std::pair;
 
 static auto test_determine_peaks() -> int {
   // Test the peak detection
 
   // Generate sin wave data
-  vector<float> wave;
+  vector<float> wave(100);
 
-  for (int i = 0; i < 100; i++) {
-    wave.push_back(sin(i * 3.141592 / 20));
+  for (size_t i = 0; i < 100; i++) {
+    wave[i] = sinf(i * 3.141592f / 20);
   }
 
   // Run function
@@ -105,10 +110,10 @@ static auto test_fft_data() -> int {
   // Read in csv data
   while (getline(file, line)) {
     vector<float> row;
-    stringstream ss(line);
+    stringstream sstream(line);
     string cell;
 
-    while (getline(ss, cell, ',')) {
+    while (getline(sstream, cell, ',')) {
       row.push_back(stof(cell));
     }
     fft_data.push_back(row);
@@ -117,9 +122,9 @@ static auto test_fft_data() -> int {
   file.close();
 
   // Get the magnitude column
-  vector<float> fft_magnitude;
-  for (vector<float> row : fft_data) {
-    fft_magnitude.push_back(row[1]);
+  vector<float> fft_magnitude(fft_data.size());
+  for (size_t i = 0; i < fft_data.size(); i++) {
+    fft_magnitude[i] = fft_data[i][1];
   }
 
   // Find the noise floor
@@ -132,8 +137,8 @@ static auto test_fft_data() -> int {
   // Get frequencies of peaks
   vector<float> frequencies;
   for (size_t peak_index : peaks) {
-    float f = fft_data[peak_index][0];
-    cout << f << "\n";
+    float file = fft_data[peak_index][0];
+    cout << file << "\n";
     frequencies.push_back(fft_data[peak_index][0]);
   }
 
@@ -222,11 +227,10 @@ static auto test_chord_lookup() -> int {
 
 auto main(int, char**) -> int {
 
-    if (test_determine_peaks()) return 1;
-    if (test_note_lookup()) return 1;
-    if (test_fft_data()) return 1;
-    if (test_chord_lookup() != 0)
-      return 1;
+    if (test_determine_peaks() != 0) { return 1; }
+    if (test_note_lookup() != 0) { return 1; }
+    if (test_fft_data() != 0) { return 1; }
+    if (test_chord_lookup() != 0) { return 1; }
 
   return 0;
 }

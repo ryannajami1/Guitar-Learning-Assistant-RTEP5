@@ -144,8 +144,7 @@ auto main() -> int {
     if (test_passed) {
         std::cout << "✓ Test PASSED: All expected frequencies were detected!" << std::endl;
         return 0;
-    } else {
-        std::cerr << "✗ Test FAILED: Not all expected frequencies were detected." << std::endl;
-        return 1;
     }
+    std::cerr << "✗ Test FAILED: Not all expected frequencies were detected." << std::endl;
+    return 1;
 }
