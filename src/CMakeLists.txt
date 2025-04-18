@@ -1,6 +1,10 @@
 # src/CMakeLists.txt
 set(libwebsockets_lib "/usr/lib/aarch64-linux-gnu/libwebsockets.so.17")
 
+if(NOT EXISTS libwebsockets_lib)
+    set(libwebsockets_lib "/usr/lib/x86_64-linux-gnu/libwebsockets.so.17")
+endif()
+
 add_subdirectory(input)
 add_subdirectory(compute)
 add_subdirectory(chord-detection)

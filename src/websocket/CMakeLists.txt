@@ -1,11 +1,7 @@
 set(libwebsockets_lib "/usr/lib/aarch64-linux-gnu/libwebsockets.so.17")
-message(STATUS "Using libwebsockets: ${libwebsockets_lib}")
 
-# Debug output
-if(libwebsockets_lib)
-    message(STATUS "Found libwebsockets: ${libwebsockets_lib}")
-else()
-    message(FATAL_ERROR "libwebsockets not found!")
+if(NOT EXISTS libwebsockets_lib)
+    set(libwebsockets_lib "/usr/lib/x86_64-linux-gnu/libwebsockets.so.17")
 endif()
 
 # Create a library
