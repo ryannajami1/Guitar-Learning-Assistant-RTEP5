@@ -33,10 +33,8 @@ jobs:
       run: |
         chmod +x compile.sh
         ./compile.sh 2>&1 | tee output.log
-        BUILD_STATUS=$? # Capture the exit code
-        cat output.log # Print the log for debugging
-        if [ $BUILD_STATUS -ne 0 ]; then
-          echo "::error::Build failed with exit code $BUILD_STATUS"
+        if [grep -q "error" output.log || grep -q "Error" output.log ]; then
+          echo "::error::Build failed"
           exit 1
         else
           echo "Build completed successfully."
@@ -69,7 +67,12 @@ jobs:
     - name: Check for warnings in the build log
       run: |
         cat output.log
-        ! grep -q "warning:" output.log
+        if [grep -q "warning" output.log; || grep -q "Warning" output.log; ] then
+          echo "::error::Warnings found in build log"
+          exit 1
+        else
+          echo "No warnings found in build log."
+        fi
 
   test:
     runs-on: ubuntu-latest
