@@ -1,6 +1,7 @@
 # Guitar-Learning-Assistant-RTEP5 🎸
-
+<p align="center">
 <img src="https://github.com/user-attachments/assets/eebc4126-89b1-45b2-9803-2ba0b588f1ac" height=250 width="auto">
+</p>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/68d1c1fa-daec-461f-8109-cb89f2e0c949" alt="Picture1" width="30%" height="auto">
