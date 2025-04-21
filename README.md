@@ -19,7 +19,7 @@ If the user plays incorrectly, the screen will show wrong (X) and briefly show t
 
 The device has to react to the signal received from the guitar, and determine if the sound is correct or not.
 
-# WIKI
+# WIKI / Report
 For more infromation on the project such as hardware and software, social media links, and developer tips please check out our WIKI:
 https://github.com/ryannajami1/Guitar-Learning-Assistant-RTEP5/wiki
 
